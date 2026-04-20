@@ -9,6 +9,7 @@ EXERCISES = {
     "full_body": [
         {"id": "pushups", "name": "Push-ups", "default_sets": 3, "default_reps": "10-15", "mins": 6},
         {"id": "bw_squat", "name": "Bodyweight Squat", "default_sets": 3, "default_reps": "15-20", "mins": 6},
+        {"id": "walking_lunge", "name": "Walking Lunge", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
         {"id": "db_row", "name": "Dumbbell Row", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "goblet_squat", "name": "Goblet Squat", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells|kettlebell"]},
     ],
@@ -16,46 +17,31 @@ EXERCISES = {
         {"id": "pushups", "name": "Push-ups", "default_sets": 4, "default_reps": "10-15", "mins": 8},
         {"id": "diamond_pushups", "name": "Diamond Push-ups", "default_sets": 3, "default_reps": "8-12", "mins": 7},
         {"id": "db_bench", "name": "Dumbbell Bench Press", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
-        {"id": "incline_db_press", "name": "Incline DB Press", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells", "bench"]},
-        {"id": "barbell_bench", "name": "Barbell Bench Press", "default_sets": 5, "default_reps": "5", "mins": 12, "needs": ["barbell", "bench"]},
     ],
     "triceps": [
-        {"id": "bench_dips", "name": "Bench/Chair Dips", "default_sets": 4, "default_reps": "10-15", "mins": 8},
+        {"id": "bench_dips", "name": "Bench Dips", "default_sets": 4, "default_reps": "10-15", "mins": 8},
         {"id": "close_pushups", "name": "Close-Grip Push-ups", "default_sets": 4, "default_reps": "8-12", "mins": 8},
         {"id": "db_oh_ext", "name": "DB Overhead Tricep Extension", "default_sets": 3, "default_reps": "10-15", "mins": 8, "needs": ["dumbbells"]},
-        {"id": "db_kickback", "name": "DB Tricep Kickback", "default_sets": 3, "default_reps": "12-15", "mins": 8, "needs": ["dumbbells"]},
-        {"id": "cable_pushdown", "name": "Cable Pushdown", "default_sets": 4, "default_reps": "10-15", "mins": 10, "needs": ["cable_machine"]},
     ],
     "biceps": [
-        {"id": "towel_curl_iso", "name": "Towel Curl Isometric", "default_sets": 3, "default_reps": "20-30 sec", "mins": 7},
-        {"id": "chinup_hold", "name": "Chin-Up Hold", "default_sets": 4, "default_reps": "15-30 sec", "mins": 8, "needs": ["pullup_bar"]},
         {"id": "db_curl", "name": "Dumbbell Curl", "default_sets": 4, "default_reps": "10-15", "mins": 9, "needs": ["dumbbells"]},
         {"id": "hammer_curl", "name": "Hammer Curl", "default_sets": 4, "default_reps": "10-12", "mins": 9, "needs": ["dumbbells"]},
         {"id": "barbell_curl", "name": "Barbell Curl", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["barbell"]},
     ],
     "back": [
-        {"id": "superman", "name": "Superman", "default_sets": 4, "default_reps": "12-15", "mins": 7},
-        {"id": "bird_dog", "name": "Bird Dog", "default_sets": 3, "default_reps": "10 each side", "mins": 6},
         {"id": "pullups", "name": "Pull-ups", "default_sets": 4, "default_reps": "AMRAP", "mins": 10, "needs": ["pullup_bar"]},
         {"id": "db_row", "name": "Dumbbell Row", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "barbell_row", "name": "Barbell Row", "default_sets": 4, "default_reps": "6-10", "mins": 10, "needs": ["barbell"]},
-        {"id": "lat_pulldown", "name": "Lat Pulldown", "default_sets": 4, "default_reps": "10-12", "mins": 10, "needs": ["cable_machine"]},
     ],
     "legs": [
         {"id": "bw_squat", "name": "Bodyweight Squat", "default_sets": 4, "default_reps": "15-20", "mins": 8},
         {"id": "reverse_lunge", "name": "Reverse Lunge", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
-        {"id": "glute_bridge", "name": "Glute Bridge", "default_sets": 4, "default_reps": "12-20", "mins": 8},
-        {"id": "step_ups", "name": "Step-ups", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
         {"id": "goblet_squat", "name": "Goblet Squat", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells|kettlebell"]},
-        {"id": "db_rdl", "name": "DB Romanian Deadlift", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
-        {"id": "barbell_squat", "name": "Barbell Back Squat", "default_sets": 5, "default_reps": "5", "mins": 12, "needs": ["barbell", "squat_rack"]},
     ],
     "core": [
         {"id": "plank", "name": "Plank", "default_sets": 4, "default_reps": "30-60 sec", "mins": 8},
         {"id": "side_plank", "name": "Side Plank", "default_sets": 3, "default_reps": "30-45 sec each", "mins": 7},
         {"id": "deadbug", "name": "Dead Bug", "default_sets": 3, "default_reps": "10 each", "mins": 6},
-        {"id": "bicycle_crunch", "name": "Bicycle Crunch", "default_sets": 3, "default_reps": "20 total", "mins": 6},
-        {"id": "leg_raises", "name": "Leg Raises", "default_sets": 3, "default_reps": "10-15", "mins": 7},
     ],
 }
 
@@ -140,7 +126,6 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
       --muted: #cbd5e1;
       --accent: #60a5fa;
       --accent2: #22d3ee;
-      --success: #22c55e;
     }}
     * {{ box-sizing: border-box; }}
     body {{
@@ -159,7 +144,6 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
       backdrop-filter: blur(8px);
     }}
     .glass {{ box-shadow: 0 12px 32px rgba(0,0,0,.25); }}
-    h1, h2, h3 {{ margin-top: .2rem; }}
     .muted {{ color: var(--muted); }}
     .equip {{
       display: grid;
@@ -295,15 +279,15 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
           var exHtml = "";
           (item.exercise_logs || []).forEach(function(ex) {{
             exHtml += "<div class='history-ex'>" +
-                        "<p><strong>" + ex.name + "</strong></p>" +
-                        "<p>Planned sets: " + ex.planned_sets + " | Completed sets: " + ex.completed_sets + "</p>" +
-                        "<p>Reps by set: " + (ex.reps_by_set || []).join(", ") + "</p>" +
+                      "<p><strong>" + ex.name + "</strong></p>" +
+                      "<p>Planned sets: " + ex.planned_sets + " | Completed sets: " + ex.completed_sets + "</p>" +
+                      "<p>Reps by set: " + (ex.reps_by_set || []).join(", ") + "</p>" +
                       "</div>";
           }});
           html += "<div class='history-item'>" +
-                    "<p><strong>Completed:</strong> " + (item.completed_at || "-") + "</p>" +
-                    "<p><strong>Target:</strong> " + item.target_minutes + " min | <strong>Actual:</strong> " + item.actual_duration + "</p>" +
-                    exHtml +
+                  "<p><strong>Completed:</strong> " + (item.completed_at || "-") + "</p>" +
+                  "<p><strong>Target:</strong> " + item.target_minutes + " min | <strong>Actual:</strong> " + item.actual_duration + "</p>" +
+                  exHtml +
                   "</div>";
         }});
         historyList.innerHTML = html;
@@ -336,7 +320,6 @@ def render_session_page(selected_ids, payload, target_minutes):
         sets = max(1, int(ex.get("default_sets", 3)))
         reps_default = ex.get("default_reps", "10")
         set_rows = ""
-
         for s in range(1, sets + 1):
             sid = f"{ex_idx}-{s}"
             set_rows += f"""
@@ -354,10 +337,12 @@ def render_session_page(selected_ids, payload, target_minutes):
             """
 
         rows += f"""
-        <div class="session-card" data-exercise-name="{ex['name']}" data-planned-sets="{sets}">
+        <div class="session-card" data-exercise-name="{ex['name']}" data-planned-sets="{sets}" data-next-set="{sets + 1}" data-ex-index="{ex_idx}">
           <h3>{ex["name"]}</h3>
-          <p><strong>Suggested:</strong> {sets} sets x {reps_default}</p>
+          <p><strong>Suggested:</strong> <span class="set-count">{sets}</span> sets x {reps_default}</p>
           <button type="button" class="delete-ex-btn">🗑 Delete Exercise</button>
+          <button type="button" class="add-set-btn">➕ Add Set</button>
+          <button type="button" class="remove-set-btn">➖ Delete Last Set</button>
           <div class="set-list">{set_rows}</div>
         </div>
         """
@@ -439,7 +424,7 @@ def render_session_page(selected_ids, payload, target_minutes):
       <button type="button" id="add-ex-btn" class="btn-primary">Add Exercise</button>
     </div>
 
-    <p>Checking a set starts rest timer using that row’s custom rest value.</p>
+    <p>You can add/delete exercises and sets while working out.</p>
 
     <div id="session-container">
       {rows}
@@ -526,7 +511,6 @@ def render_session_page(selected_ids, payload, target_minutes):
         var el = timerEl(setId);
         if (!el) return;
         el.textContent = fmt(left);
-
         setTimers[setId] = setInterval(function() {{
           left -= 1;
           el.textContent = fmt(Math.max(left, 0));
@@ -538,16 +522,15 @@ def render_session_page(selected_ids, payload, target_minutes):
         }}, 1000);
       }}
 
-      function createSetRow(exIdx, setNum) {{
-        var sid = exIdx + "-" + setNum;
+      function createSetRow(setId, setNumber) {{
         var div = document.createElement("div");
         div.className = "set-item";
-        div.setAttribute("data-setid", sid);
+        div.setAttribute("data-setid", setId);
         div.innerHTML =
-          "<label><input type='checkbox' class='set-done'> Set " + setNum + "</label>" +
+          "<label><input type='checkbox' class='set-done'> Set " + setNumber + "</label>" +
           "<label>Reps done: <input type='number' min='0' value='0' class='set-reps'></label>" +
           "<label>Custom rest (sec): <input type='number' min='5' value='60' class='custom-rest-input'></label>" +
-          "<span id='rest-" + sid + "' class='set-timer'>00:00</span>" +
+          "<span id='rest-" + setId + "' class='set-timer'>00:00</span>" +
           "<button type='button' class='rest-btn' data-seconds='30'>30s</button>" +
           "<button type='button' class='rest-btn' data-seconds='60'>60s</button>" +
           "<button type='button' class='rest-btn' data-seconds='90'>90s</button>" +
@@ -562,16 +545,30 @@ def render_session_page(selected_ids, payload, target_minutes):
         card.className = "session-card";
         card.setAttribute("data-exercise-name", name);
         card.setAttribute("data-planned-sets", String(sets));
+        card.setAttribute("data-next-set", String(sets + 1));
+        card.setAttribute("data-ex-index", String(exIdx));
+
         card.innerHTML =
           "<h3>" + name + "</h3>" +
-          "<p><strong>Suggested:</strong> " + sets + " sets x " + reps + "</p>" +
-          "<button type='button' class='delete-ex-btn'>🗑 Delete Exercise</button>" +
+          "<p><strong>Suggested:</strong> <span class='set-count'>" + sets + "</span> sets x " + reps + "</p>" +
+          "<button type='button' class='delete-ex-btn'>🗑 Delete Exercise</button> " +
+          "<button type='button' class='add-set-btn'>➕ Add Set</button> " +
+          "<button type='button' class='remove-set-btn'>➖ Delete Last Set</button>" +
           "<div class='set-list'></div>";
+
         var list = card.querySelector(".set-list");
         for (var i = 1; i <= sets; i++) {{
-          list.appendChild(createSetRow(exIdx, i));
+          var sid = exIdx + "-" + i;
+          list.appendChild(createSetRow(sid, i));
         }}
         container.appendChild(card);
+      }}
+
+      function updateCardSetMeta(card) {{
+        var count = card.querySelectorAll(".set-item").length;
+        card.setAttribute("data-planned-sets", String(count));
+        var setCountEl = card.querySelector(".set-count");
+        if (setCountEl) setCountEl.textContent = String(count);
       }}
 
       document.getElementById("add-ex-btn").addEventListener("click", function() {{
@@ -583,15 +580,12 @@ def render_session_page(selected_ids, payload, target_minutes):
           return;
         }}
         if (!sets || sets < 1) sets = 1;
-
         addExerciseCard(name, sets, reps);
-
         document.getElementById("new-ex-name").value = "";
         document.getElementById("new-ex-sets").value = "3";
         document.getElementById("new-ex-reps").value = "10-12";
       }});
 
-      // event delegation
       document.addEventListener("click", function(e) {{
         var t = e.target;
 
@@ -601,8 +595,36 @@ def render_session_page(selected_ids, payload, target_minutes):
           return;
         }}
 
+        if (t.classList.contains("add-set-btn")) {{
+          var cardAdd = t.closest(".session-card");
+          if (!cardAdd) return;
+          var exIndex = cardAdd.getAttribute("data-ex-index");
+          var nextSet = Number(cardAdd.getAttribute("data-next-set") || "1");
+          var sidAdd = exIndex + "-" + nextSet;
+          var setList = cardAdd.querySelector(".set-list");
+          setList.appendChild(createSetRow(sidAdd, nextSet));
+          cardAdd.setAttribute("data-next-set", String(nextSet + 1));
+          updateCardSetMeta(cardAdd);
+          return;
+        }}
+
+        if (t.classList.contains("remove-set-btn")) {{
+          var cardRemove = t.closest(".session-card");
+          if (!cardRemove) return;
+          var setList2 = cardRemove.querySelector(".set-list");
+          var items = setList2.querySelectorAll(".set-item");
+          if (!items.length) return;
+          var last = items[items.length - 1];
+          var setId = last.getAttribute("data-setid");
+          stopSetRest(setId);
+          last.remove();
+          updateCardSetMeta(cardRemove);
+          return;
+        }}
+
         var setItem = t.closest(".set-item");
         if (!setItem) return;
+
         var setId = setItem.getAttribute("data-setid");
         var restInput = setItem.querySelector(".custom-rest-input");
 
@@ -687,7 +709,7 @@ def render_session_page(selected_ids, payload, target_minutes):
         var item = {{
           completed_at: completedAt,
           completed_at_iso: now.toISOString(),
-          started_at_utc: startedAt,
+          started_at_utc: "{started_at}",
           target_minutes: {max(1, target_minutes)},
           actual_duration: actualDuration,
           exercise_logs: exerciseLogs
