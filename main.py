@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI(title="Free Workout Decider")
 
+
 EXERCISES = {
     "full_body": [
         {"id": "pushups", "name": "Push-ups", "default_sets": 3, "default_reps": "10-15", "mins": 6},
@@ -12,20 +13,17 @@ EXERCISES = {
         {"id": "walking_lunge", "name": "Walking Lunge", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
         {"id": "db_row", "name": "Dumbbell Row", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "goblet_squat", "name": "Goblet Squat", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells|kettlebell"]},
-        {"id": "kb_swing", "name": "Kettlebell Swing", "default_sets": 4, "default_reps": "12-20", "mins": 10, "needs": ["kettlebell"]},
     ],
     "upper_body": [
         {"id": "pushups", "name": "Push-ups", "default_sets": 4, "default_reps": "10-15", "mins": 8},
         {"id": "db_bench", "name": "Dumbbell Bench Press", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "db_shoulder_press", "name": "Dumbbell Shoulder Press", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
-        {"id": "db_bicep_curl", "name": "Dumbbell Bicep Curl", "default_sets": 3, "default_reps": "10-15", "mins": 8, "needs": ["dumbbells"]},
         {"id": "pullups", "name": "Pull-ups", "default_sets": 4, "default_reps": "AMRAP", "mins": 10, "needs": ["pullup_bar"]},
     ],
     "lower_body": [
         {"id": "bw_squat", "name": "Bodyweight Squat", "default_sets": 4, "default_reps": "15-20", "mins": 8},
         {"id": "reverse_lunge", "name": "Reverse Lunge", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
         {"id": "glute_bridge", "name": "Glute Bridge", "default_sets": 4, "default_reps": "12-20", "mins": 8},
-        {"id": "step_ups", "name": "Step-ups", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
         {"id": "goblet_squat", "name": "Goblet Squat", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells|kettlebell"]},
     ],
     "core": [
@@ -33,7 +31,6 @@ EXERCISES = {
         {"id": "side_plank", "name": "Side Plank", "default_sets": 3, "default_reps": "30-45 sec each", "mins": 7},
         {"id": "deadbug", "name": "Dead Bug", "default_sets": 3, "default_reps": "10 each side", "mins": 6},
         {"id": "bicycle_crunch", "name": "Bicycle Crunch", "default_sets": 3, "default_reps": "20 total", "mins": 6},
-        {"id": "leg_raises", "name": "Leg Raises", "default_sets": 3, "default_reps": "10-15", "mins": 7},
     ],
 }
 
@@ -108,7 +105,7 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Workout Decider</title>
+  <title>Free Workout Decider</title>
   <style>
     body {{ font-family: Arial, sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
     .card {{ background:#fff; border-radius:12px; padding:1rem; box-shadow:0 8px 24px rgba(0,0,0,.08); }}
@@ -165,7 +162,6 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
 
   <script>
     (function() {{
-      // selected-time counter
       var picks = document.querySelectorAll(".pick-box");
       var status = document.getElementById("pick-status");
       var target = {minutes};
@@ -185,7 +181,6 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
       picks.forEach(function(p) {{ p.addEventListener("change", updateSelectedTime); }});
       updateSelectedTime();
 
-      // history render with detailed exercise logs
       var historyList = document.getElementById("history-list");
       var clearBtn = document.getElementById("clear-history-btn");
 
@@ -239,6 +234,23 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
     """
 
 
+def render_set_row(ex_idx, set_idx):
+    sid = f"{ex_idx}-{set_idx}"
+    return f"""
+    <div class="set-item">
+      <label><input type="checkbox" class="set-done" data-setid="{sid}"> Set {set_idx}</label>
+      <label>Reps done: <input type="number" min="0" value="0" class="set-reps"></label>
+      <label>Custom rest (sec): <input type="number" min="5" value="60" id="custom-rest-{sid}" class="custom-rest-input"></label>
+      <span id="rest-{sid}" class="set-timer">00:00</span>
+      <button type="button" onclick="startPresetRest('{sid}', 30)">30s</button>
+      <button type="button" onclick="startPresetRest('{sid}', 60)">60s</button>
+      <button type="button" onclick="startPresetRest('{sid}', 90)">90s</button>
+      <button type="button" onclick="startCustomRest('{sid}')">Custom</button>
+      <button type="button" onclick="stopSetRest('{sid}')">Stop</button>
+    </div>
+    """
+
+
 def render_session_page(selected_ids, payload, target_minutes):
     if not selected_ids:
         return """
@@ -262,28 +274,12 @@ def render_session_page(selected_ids, payload, target_minutes):
     for ex_idx, ex in enumerate(selected):
         sets = max(1, int(ex.get("default_sets", 3)))
         reps_default = ex.get("default_reps", "10")
-        set_rows = ""
-
-        for s in range(1, sets + 1):
-            sid = f"{ex_idx}-{s}"
-            set_rows += f"""
-            <div class="set-item">
-              <label><input type="checkbox" class="set-done" data-setid="{sid}"> Set {s}</label>
-              <label>Reps done: <input type="number" min="0" value="0" class="set-reps"></label>
-              <label>Custom rest (sec): <input type="number" min="5" value="60" id="custom-rest-{sid}" class="custom-rest-input"></label>
-              <span id="rest-{sid}" class="set-timer">00:00</span>
-              <button type="button" onclick="startSetRest('{sid}', 30)">30s</button>
-              <button type="button" onclick="startSetRest('{sid}', 60)">60s</button>
-              <button type="button" onclick="startSetRest('{sid}', 90)">90s</button>
-              <button type="button" onclick="startCustomRest('{sid}')">Custom</button>
-              <button type="button" onclick="stopSetRest('{sid}')">Stop</button>
-            </div>
-            """
-
+        set_rows = "".join(render_set_row(ex_idx, s) for s in range(1, sets + 1))
         rows += f"""
         <div class="session-card" data-exercise-name="{ex['name']}" data-planned-sets="{sets}">
           <h3>{ex["name"]}</h3>
           <p><strong>Suggested:</strong> {sets} sets x {reps_default}</p>
+          <button type="button" class="delete-ex-btn">🗑 Delete Exercise</button>
           <div class="set-list">{set_rows}</div>
         </div>
         """
@@ -298,12 +294,13 @@ def render_session_page(selected_ids, payload, target_minutes):
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Workout Session</title>
   <style>
-    body {{ font-family: Arial, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
+    body {{ font-family: Arial, sans-serif; max-width: 980px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
     .session-card {{ background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:1rem; margin-bottom:1rem; }}
-    .set-list {{ display:grid; gap:.6rem; }}
+    .set-list {{ display:grid; gap:.6rem; margin-top:.6rem; }}
     .set-item {{ display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; border:1px solid #e5e7eb; border-radius:8px; padding:.5rem; }}
     .set-timer {{ font-family:monospace; font-weight:700; min-width:60px; }}
     .workout-timer {{ font-family:monospace; font-weight:700; font-size:1.2rem; margin-left:.5rem; }}
+    .add-box {{ background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:1rem; margin-bottom:1rem; }}
     button, input {{ padding:.45rem; }}
   </style>
 </head>
@@ -319,9 +316,18 @@ def render_session_page(selected_ids, payload, target_minutes):
     <span id="workout-countdown" class="workout-timer">00:00</span>
   </div>
 
-  <p>Check sets as completed. Rest timers start only when you click a rest button.</p>
+  <div class="add-box">
+    <h3>Add Exercise Mid-Workout</h3>
+    <label>Exercise Name: <input type="text" id="new-ex-name" placeholder="e.g. Tricep Dips"></label>
+    <label>Sets: <input type="number" min="1" value="3" id="new-ex-sets"></label>
+    <label>Default reps: <input type="text" value="10-12" id="new-ex-reps"></label>
+    <button type="button" id="add-ex-btn">Add Exercise</button>
+  </div>
 
-  {rows}
+  <p>Checking a set now uses the current custom rest value in that row.</p>
+  <div id="session-container">
+    {rows}
+  </div>
 
   <p><a href="/">← Back to planner</a></p>
 
@@ -332,12 +338,15 @@ def render_session_page(selected_ids, payload, target_minutes):
       var workoutInterval = null;
       var hasStarted = false;
       var startedAt = "{started_at}";
+      var setTimers = {{}};
+      var dynamicExerciseIdx = 1000; // for added exercises
 
       var display = document.getElementById("workout-countdown");
       var startBtn = document.getElementById("start-workout-btn");
       var pauseBtn = document.getElementById("pause-workout-btn");
       var resetBtn = document.getElementById("reset-workout-btn");
       var completeBtn = document.getElementById("complete-workout-btn");
+      var container = document.getElementById("session-container");
 
       function fmt(sec) {{
         var m = String(Math.floor(sec / 60)).padStart(2, "0");
@@ -387,49 +396,131 @@ def render_session_page(selected_ids, payload, target_minutes):
         }});
       }}
 
-      // rest timers (manual start only)
-      var setTimers = {{}};
-
-      function fmtRest(sec) {{
-        var m = String(Math.floor(sec / 60)).padStart(2, "0");
-        var s = String(sec % 60).padStart(2, "0");
-        return m + ":" + s;
-      }}
-
-      window.startSetRest = function(setId, seconds) {{
-        window.stopSetRest(setId);
-        var left = seconds;
-        var el = document.getElementById("rest-" + setId);
-        if (!el) return;
-
-        el.textContent = fmtRest(left);
-        setTimers[setId] = setInterval(function() {{
-          left -= 1;
-          el.textContent = fmtRest(Math.max(left, 0));
-          if (left <= 0) {{
-            clearInterval(setTimers[setId]);
-            delete setTimers[setId];
-            el.textContent = "DONE ✅";
-          }}
-        }}, 1000);
-      }};
-
-      window.stopSetRest = function(setId) {{
+      function stopSetRest(setId) {{
         if (setTimers[setId]) {{
           clearInterval(setTimers[setId]);
           delete setTimers[setId];
         }}
         var el = document.getElementById("rest-" + setId);
         if (el) el.textContent = "00:00";
+      }}
+      window.stopSetRest = stopSetRest;
+
+      function startSetRest(setId, seconds) {{
+        stopSetRest(setId);
+        var left = seconds;
+        var el = document.getElementById("rest-" + setId);
+        if (!el) return;
+        el.textContent = fmt(left);
+
+        setTimers[setId] = setInterval(function() {{
+          left -= 1;
+          el.textContent = fmt(Math.max(left, 0));
+          if (left <= 0) {{
+            clearInterval(setTimers[setId]);
+            delete setTimers[setId];
+            el.textContent = "DONE ✅";
+          }}
+        }}, 1000);
+      }}
+      window.startSetRest = startSetRest;
+
+      // preset button now autofills input + starts timer
+      window.startPresetRest = function(setId, seconds) {{
+        var input = document.getElementById("custom-rest-" + setId);
+        if (input) input.value = String(seconds);
+        startSetRest(setId, seconds);
       }};
 
+      // custom button uses current value in input
       window.startCustomRest = function(setId) {{
         var input = document.getElementById("custom-rest-" + setId);
         var sec = 60;
         if (input && input.value) sec = Number(input.value);
         if (!sec || sec < 5) sec = 5;
-        window.startSetRest(setId, sec);
+        startSetRest(setId, sec);
       }};
+
+      // checkbox -> use custom value and start rest
+      function onSetCheckChanged(cb) {{
+        var setId = cb.getAttribute("data-setid");
+        if (!setId) return;
+        if (cb.checked) {{
+          var input = document.getElementById("custom-rest-" + setId);
+          var sec = 60;
+          if (input && input.value) sec = Number(input.value);
+          if (!sec || sec < 5) sec = 5;
+          startSetRest(setId, sec);
+        }} else {{
+          stopSetRest(setId);
+        }}
+      }}
+
+      // event delegation for dynamic content
+      document.addEventListener("change", function(e) {{
+        if (e.target && e.target.classList.contains("set-done")) {{
+          onSetCheckChanged(e.target);
+        }}
+      }});
+
+      document.addEventListener("click", function(e) {{
+        if (e.target && e.target.classList.contains("delete-ex-btn")) {{
+          var card = e.target.closest(".session-card");
+          if (card) card.remove();
+        }}
+      }});
+
+      // add exercise mid-workout
+      var addBtn = document.getElementById("add-ex-btn");
+      if (addBtn) {{
+        addBtn.addEventListener("click", function() {{
+          var nameInput = document.getElementById("new-ex-name");
+          var setsInput = document.getElementById("new-ex-sets");
+          var repsInput = document.getElementById("new-ex-reps");
+
+          var name = (nameInput.value || "").trim();
+          var sets = Number(setsInput.value || 0);
+          var reps = (repsInput.value || "10-12").trim();
+
+          if (!name) {{
+            alert("Please enter an exercise name.");
+            return;
+          }}
+          if (!sets || sets < 1) sets = 1;
+
+          var exIdx = dynamicExerciseIdx++;
+          var setRows = "";
+          for (var i = 1; i <= sets; i++) {{
+            var sid = exIdx + "-" + i;
+            setRows +=
+              "<div class='set-item'>" +
+                "<label><input type='checkbox' class='set-done' data-setid='" + sid + "'> Set " + i + "</label>" +
+                "<label>Reps done: <input type='number' min='0' value='0' class='set-reps'></label>" +
+                "<label>Custom rest (sec): <input type='number' min='5' value='60' id='custom-rest-" + sid + "' class='custom-rest-input'></label>" +
+                "<span id='rest-" + sid + "' class='set-timer'>00:00</span>" +
+                "<button type='button' onclick='startPresetRest(\"" + sid + "\",30)'>30s</button>" +
+                "<button type='button' onclick='startPresetRest(\"" + sid + "\",60)'>60s</button>" +
+                "<button type='button' onclick='startPresetRest(\"" + sid + "\",90)'>90s</button>" +
+                "<button type='button' onclick='startCustomRest(\"" + sid + "\")'>Custom</button>" +
+                "<button type='button' onclick='stopSetRest(\"" + sid + "\")'>Stop</button>" +
+              "</div>";
+          }}
+
+          var html =
+            "<div class='session-card' data-exercise-name='" + name.replace(/'/g, "&#39;") + "' data-planned-sets='" + sets + "'>" +
+              "<h3>" + name + "</h3>" +
+              "<p><strong>Suggested:</strong> " + sets + " sets x " + reps + "</p>" +
+              "<button type='button' class='delete-ex-btn'>🗑 Delete Exercise</button>" +
+              "<div class='set-list'>" + setRows + "</div>" +
+            "</div>";
+
+          container.insertAdjacentHTML("beforeend", html);
+
+          nameInput.value = "";
+          setsInput.value = "3";
+          repsInput.value = "10-12";
+        }});
+      }}
 
       // save workout with detailed logs
       if (completeBtn) {{
@@ -477,7 +568,7 @@ def render_session_page(selected_ids, payload, target_minutes):
           var item = {{
             completed_at: completedAt,
             completed_at_iso: now.toISOString(),
-            started_at_utc: startedAt,
+            started_at_utc: "{started_at}",
             target_minutes: {max(1, target_minutes)},
             actual_duration: actualDuration,
             exercise_logs: exerciseLogs
@@ -492,7 +583,7 @@ def render_session_page(selected_ids, payload, target_minutes):
           history.push(item);
           localStorage.setItem("workout_history", JSON.stringify(history));
 
-          alert("Workout saved with detailed exercise logs.");
+          alert("Workout saved with detailed logs.");
         }});
       }}
     }})();
@@ -511,7 +602,7 @@ async def home():
 async def decide(
     body_part: str = Form(...),
     equipment: list[str] = Form(default=[]),
-    minutes: int = Form(...)
+    minutes: int = Form(...),
 ):
     options = get_filtered_options(body_part, equipment)
     return render_planner_page(
