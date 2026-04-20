@@ -3,146 +3,113 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI(title="Free Workout Decider")
 
-FULL_GYM = {"barbell", "squat_rack", "cable_machine"}
-BASIC = {
-    "dumbbells", "kettlebell", "resistance_bands", "pullup_bar",
-    "bench", "bike", "rower", "treadmill", "jump_rope"
+# ----------------------------
+# Exercise library
+# ----------------------------
+# equipment rules:
+# - [] means no equipment needed
+# - ["dumbbells"] means must have dumbbells
+# - ["barbell", "squat_rack"] means must have both
+# - ["bike|treadmill|rower"] means one of those is enough
+EXERCISES = {
+    "upper_body": [
+        {"name": "Push-ups", "sets": "4", "reps": "10-15", "equipment": [], "video_id": "IODxDxX7oi4"},
+        {"name": "Pike Push-ups", "sets": "3", "reps": "8-12", "equipment": [], "video_id": "qHQ_E-f5278"},
+        {"name": "Dumbbell Bench Press", "sets": "4", "reps": "8-12", "equipment": ["dumbbells"], "video_id": "VmB1G1K7v94"},
+        {"name": "One-Arm Dumbbell Row", "sets": "4", "reps": "8-12 each", "equipment": ["dumbbells"], "video_id": "pYcpY20QaE8"},
+        {"name": "Barbell Bench Press", "sets": "4", "reps": "5-8", "equipment": ["barbell", "bench"], "video_id": "rT7DgCr-3pg"},
+        {"name": "Overhead Press", "sets": "3", "reps": "6-10", "equipment": ["barbell"], "video_id": "2yjwXTZQDDI"},
+    ],
+    "lower_body": [
+        {"name": "Bodyweight Squat", "sets": "4", "reps": "15-20", "equipment": [], "video_id": "aclHkVaku9U"},
+        {"name": "Reverse Lunge", "sets": "3", "reps": "10 each", "equipment": [], "video_id": "wrwwXE_x-pQ"},
+        {"name": "Goblet Squat", "sets": "4", "reps": "8-12", "equipment": ["dumbbells|kettlebell"], "video_id": "MeIiIdhvXT4"},
+        {"name": "Romanian Deadlift (DB)", "sets": "4", "reps": "8-12", "equipment": ["dumbbells"], "video_id": "0YONJjY6i6Q"},
+        {"name": "Back Squat", "sets": "5", "reps": "5", "equipment": ["barbell", "squat_rack"], "video_id": "ultWZbUMPL8"},
+        {"name": "Deadlift", "sets": "4", "reps": "4-6", "equipment": ["barbell"], "video_id": "op9kVnSso6Q"},
+    ],
+    "core": [
+        {"name": "Plank", "sets": "4", "reps": "30-60 sec", "equipment": [], "video_id": "ASdvN_XEl_c"},
+        {"name": "Dead Bug", "sets": "3", "reps": "10 each", "equipment": [], "video_id": "4XLEnwUr8S4"},
+        {"name": "Russian Twist", "sets": "3", "reps": "20 total", "equipment": ["dumbbells|kettlebell"], "video_id": "wkD8rjkodUI"},
+        {"name": "Cable Crunch", "sets": "4", "reps": "12-15", "equipment": ["cable_machine"], "video_id": "AV5PmZJIrrw"},
+    ],
+    "full_body": [
+        {"name": "Push-ups", "sets": "3", "reps": "10-15", "equipment": [], "video_id": "IODxDxX7oi4"},
+        {"name": "Bodyweight Squat", "sets": "3", "reps": "15-20", "equipment": [], "video_id": "aclHkVaku9U"},
+        {"name": "Goblet Squat", "sets": "4", "reps": "8-12", "equipment": ["dumbbells|kettlebell"], "video_id": "MeIiIdhvXT4"},
+        {"name": "Dumbbell Row", "sets": "4", "reps": "8-12", "equipment": ["dumbbells"], "video_id": "pYcpY20QaE8"},
+        {"name": "Back Squat", "sets": "4", "reps": "5-8", "equipment": ["barbell", "squat_rack"], "video_id": "ultWZbUMPL8"},
+        {"name": "Bench Press", "sets": "4", "reps": "5-8", "equipment": ["barbell", "bench"], "video_id": "rT7DgCr-3pg"},
+    ],
 }
 
-# exercise libraries by body part + equipment level
-WORKOUT_LIBRARY = {
-    "upper_body": {
-        "none": [
-            ("Push-ups", "4", "10-15"),
-            ("Pike Push-ups", "3", "8-12"),
-            ("Chair Dips", "3", "10-15"),
-            ("Plank Shoulder Taps", "3", "20 taps"),
-        ],
-        "basic": [
-            ("Dumbbell Bench Press", "4", "8-12"),
-            ("One-Arm Dumbbell Row", "4", "8-12 each"),
-            ("Dumbbell Shoulder Press", "3", "8-12"),
-            ("Biceps Curl", "3", "10-15"),
-            ("Triceps Overhead Extension", "3", "10-15"),
-        ],
-        "full": [
-            ("Barbell Bench Press", "4", "5-8"),
-            ("Lat Pulldown", "4", "8-12"),
-            ("Seated Cable Row", "3", "8-12"),
-            ("Overhead Press", "3", "6-10"),
-            ("Cable Triceps Pushdown", "3", "10-15"),
-        ],
-    },
-    "lower_body": {
-        "none": [
-            ("Bodyweight Squat", "4", "15-20"),
-            ("Reverse Lunge", "3", "10-12 each"),
-            ("Glute Bridge", "4", "12-20"),
-            ("Wall Sit", "3", "30-60 sec"),
-        ],
-        "basic": [
-            ("Goblet Squat", "4", "8-12"),
-            ("Romanian Deadlift (DB)", "4", "8-12"),
-            ("Step-ups", "3", "10 each"),
-            ("Kettlebell Swing", "3", "15-20"),
-        ],
-        "full": [
-            ("Back Squat", "5", "5"),
-            ("Deadlift", "4", "4-6"),
-            ("Leg Press", "3", "10-12"),
-            ("Hamstring Curl", "3", "10-15"),
-            ("Standing Calf Raise", "3", "12-20"),
-        ],
-    },
-    "core": {
-        "none": [
-            ("Plank", "4", "30-60 sec"),
-            ("Dead Bug", "3", "10 each"),
-            ("Bicycle Crunch", "3", "20 total"),
-            ("Side Plank", "3", "20-40 sec each"),
-        ],
-        "basic": [
-            ("Weighted Sit-up", "4", "10-15"),
-            ("Russian Twist", "3", "20 total"),
-            ("Dumbbell Side Bend", "3", "12 each"),
-            ("Mountain Climbers", "3", "30-45 sec"),
-        ],
-        "full": [
-            ("Cable Crunch", "4", "12-15"),
-            ("Hanging Knee Raise", "4", "8-12"),
-            ("Ab Wheel Rollout", "3", "8-12"),
-            ("Pallof Press", "3", "10 each"),
-        ],
-    },
-    "full_body": {
-        "none": [
-            ("Push-ups", "3", "10-15"),
-            ("Bodyweight Squat", "3", "15-20"),
-            ("Reverse Lunge", "3", "10 each"),
-            ("Plank", "3", "30-60 sec"),
-        ],
-        "basic": [
-            ("Goblet Squat", "4", "8-12"),
-            ("Dumbbell Row", "4", "8-12"),
-            ("Dumbbell Press", "3", "8-12"),
-            ("Kettlebell Swing", "3", "15"),
-            ("Plank", "3", "45 sec"),
-        ],
-        "full": [
-            ("Back Squat", "4", "5-8"),
-            ("Bench Press", "4", "5-8"),
-            ("Barbell Row", "4", "6-10"),
-            ("Romanian Deadlift", "3", "8-10"),
-            ("Cable Core Rotation", "3", "12 each"),
-        ],
-    },
-}
-
-CARDIO_FINISHERS = {
+GOAL_FINISHERS = {
     "fat_loss": [
-        ("Jump Rope / Fast Feet", "5 rounds", "40s on / 20s off"),
-        ("Burpees", "5 rounds", "8-12 reps"),
+        {"name": "HIIT Finisher", "sets": "5 rounds", "reps": "40s on / 20s off", "equipment": [], "video_id": "ml6cT4AZdqI"}
     ],
     "endurance": [
-        ("Zone 2 Cardio (bike/treadmill/run)", "1", "20-40 min steady"),
-        ("Optional Tempo Intervals", "4", "2 min hard / 2 min easy"),
+        {"name": "Zone 2 Cardio", "sets": "1", "reps": "20-40 min", "equipment": ["bike|treadmill|rower"], "video_id": "x9Q6xg2z2iE"}
     ],
+    "strength": []
 }
 
 
-def equipment_level(items: list[str]) -> str:
-    normalized = {x.strip().lower() for x in items if x.strip()}
-    if not normalized or normalized == {"none"}:
-        return "none"
-    if normalized & FULL_GYM:
-        return "full"
-    if normalized & BASIC:
-        return "basic"
-    return "none"
+def has_required_equipment(required_rules: list[str], selected: set[str]) -> bool:
+    """
+    required_rules examples:
+    - []                    -> no equipment needed
+    - ["dumbbells"]         -> must have dumbbells
+    - ["barbell","bench"]   -> must have both
+    - ["bike|treadmill"]    -> has one of these
+    """
+    if not required_rules:
+        return True
+
+    for rule in required_rules:
+        if "|" in rule:
+            options = set(rule.split("|"))
+            if not (options & selected):
+                return False
+        else:
+            if rule not in selected:
+                return False
+    return True
 
 
-def trim_for_time(exercises, minutes: int):
-    # quick version keeps fewer exercises
+def filter_exercises_for_equipment(exercises: list[dict], equipment_items: list[str]) -> list[dict]:
+    selected = {e.strip().lower() for e in equipment_items if e.strip() and e.strip().lower() != "none"}
+    filtered = [ex for ex in exercises if has_required_equipment(ex["equipment"], selected)]
+
+    # fallback if user selected gear that leaves nothing: return bodyweight-only options
+    if not filtered:
+        filtered = [ex for ex in exercises if ex["equipment"] == []]
+
+    return filtered
+
+
+def trim_for_time(exercises: list[dict], minutes: int) -> list[dict]:
     if minutes < 20:
         return exercises[:3]
     if minutes <= 45:
         return exercises[:4]
-    return exercises  # full list
+    return exercises[:6]
 
 
-def build_plan(goal: str, body_part: str, equipment_items: list[str], minutes: int):
+def build_plan(goal: str, body_part: str, equipment: list[str], minutes: int) -> list[dict]:
     goal = goal if goal in {"strength", "fat_loss", "endurance"} else "strength"
-    body_part = body_part if body_part in WORKOUT_LIBRARY else "full_body"
-    level = equipment_level(equipment_items)
+    body_part = body_part if body_part in EXERCISES else "full_body"
+    minutes = max(1, minutes)
 
-    base = WORKOUT_LIBRARY[body_part][level]
+    base = EXERCISES[body_part]
+    base = filter_exercises_for_equipment(base, equipment)
     base = trim_for_time(base, minutes)
 
-    # add goal-specific finishers
-    if goal in CARDIO_FINISHERS:
-        base = base + CARDIO_FINISHERS[goal][:1]
+    finishers = filter_exercises_for_equipment(GOAL_FINISHERS.get(goal, []), equipment)
+    if finishers:
+        base += finishers[:1]
 
-    return base, level
+    return base
 
 
 def checked(value: str, selected: list[str]) -> str:
@@ -153,32 +120,42 @@ def selected_attr(value: str, current: str) -> str:
     return "selected" if value == current else ""
 
 
-def render_plan_rows(plan):
-    return "".join(
-        f"<tr><td>{ex}</td><td>{sets}</td><td>{reps}</td></tr>"
-        for ex, sets, reps in plan
-    )
+def render_plan_cards(plan: list[dict]) -> str:
+    cards = []
+    for ex in plan:
+        video = f"""
+        <iframe
+          width="100%"
+          height="220"
+          src="https://www.youtube.com/embed/{ex['video_id']}"
+          title="{ex['name']} demo"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          loading="lazy"></iframe>
+        """ if ex.get("video_id") else "<p>No demo available</p>"
+
+        cards.append(f"""
+        <div class="exercise-card">
+          <h3>{ex['name']}</h3>
+          <p><strong>Sets:</strong> {ex['sets']} &nbsp; | &nbsp; <strong>Reps/Time:</strong> {ex['reps']}</p>
+          {video}
+        </div>
+        """)
+    return "".join(cards)
 
 
-def render_page(
-    plan=None,
-    selected_equipment=None,
-    selected_body_part="full_body",
-    selected_goal="strength",
-    minutes=30,
-    level_label="none",
-):
-    selected_equipment = selected_equipment or []
+def render_page(plan=None, goal="strength", body_part="full_body", minutes=30, equipment=None):
+    equipment = equipment or []
     plan_html = ""
     if plan:
         plan_html = f"""
         <div class="card" style="margin-top:1rem;">
           <h2>Your Workout Plan</h2>
-          <p><strong>Equipment tier detected:</strong> {level_label}</p>
-          <table>
-            <thead><tr><th>Exercise</th><th>Sets</th><th>Reps / Time</th></tr></thead>
-            <tbody>{render_plan_rows(plan)}</tbody>
-          </table>
+          <p>Only exercises that match your selected equipment are shown.</p>
+          <div class="exercise-grid">
+            {render_plan_cards(plan)}
+          </div>
         </div>
         """
 
@@ -186,57 +163,59 @@ def render_page(
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Free Workout Decider</title>
   <style>
-    body {{ font-family: Arial, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
+    body {{ font-family: Arial, sans-serif; max-width: 1000px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
     .card {{ background:#fff; border-radius:12px; padding:1rem; box-shadow:0 8px 24px rgba(0,0,0,.08); }}
     .equip {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.4rem; border:1px solid #e2e8f0; border-radius:10px; padding:.75rem; }}
     input, select, button {{ padding:.55rem; margin-top:.25rem; }}
     button {{ background:#2563eb; color:white; border:none; border-radius:8px; cursor:pointer; }}
-    table {{ width:100%; border-collapse:collapse; margin-top:.75rem; }}
-    th, td {{ text-align:left; padding:.55rem; border-bottom:1px solid #e5e7eb; }}
+    .exercise-grid {{ display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }}
+    .exercise-card {{ border:1px solid #e5e7eb; border-radius:10px; padding:.75rem; background:#fff; }}
+    h3 {{ margin-bottom:.4rem; }}
   </style>
 </head>
 <body>
   <h1>Free Workout Decider</h1>
-  <p>A free, logic-based workout recommendation tool.</p>
+  <p>Pick your goal, body part, and equipment. We’ll only show compatible exercises with demos.</p>
 
   <form method="post" action="/decide" class="card">
     <p>
       <label><strong>Primary Goal</strong></label><br/>
       <select name="goal" required>
-        <option value="strength" {selected_attr("strength", selected_goal)}>Build Strength</option>
-        <option value="fat_loss" {selected_attr("fat_loss", selected_goal)}>Fat Loss</option>
-        <option value="endurance" {selected_attr("endurance", selected_goal)}>Endurance</option>
+        <option value="strength" {selected_attr("strength", goal)}>Build Strength</option>
+        <option value="fat_loss" {selected_attr("fat_loss", goal)}>Fat Loss</option>
+        <option value="endurance" {selected_attr("endurance", goal)}>Endurance</option>
       </select>
     </p>
 
     <p>
       <label><strong>Body Part Focus</strong></label><br/>
       <select name="body_part" required>
-        <option value="full_body" {selected_attr("full_body", selected_body_part)}>Full Body</option>
-        <option value="upper_body" {selected_attr("upper_body", selected_body_part)}>Upper Body</option>
-        <option value="lower_body" {selected_attr("lower_body", selected_body_part)}>Lower Body</option>
-        <option value="core" {selected_attr("core", selected_body_part)}>Core</option>
+        <option value="full_body" {selected_attr("full_body", body_part)}>Full Body</option>
+        <option value="upper_body" {selected_attr("upper_body", body_part)}>Upper Body</option>
+        <option value="lower_body" {selected_attr("lower_body", body_part)}>Lower Body</option>
+        <option value="core" {selected_attr("core", body_part)}>Core</option>
       </select>
     </p>
 
     <p><strong>Equipment Available (select all that apply)</strong></p>
     <div class="equip">
-      <label><input type="checkbox" name="equipment" value="none" {checked("none", selected_equipment)}> None</label>
-      <label><input type="checkbox" name="equipment" value="dumbbells" {checked("dumbbells", selected_equipment)}> Dumbbells</label>
-      <label><input type="checkbox" name="equipment" value="kettlebell" {checked("kettlebell", selected_equipment)}> Kettlebell</label>
-      <label><input type="checkbox" name="equipment" value="resistance_bands" {checked("resistance_bands", selected_equipment)}> Resistance Bands</label>
-      <label><input type="checkbox" name="equipment" value="pullup_bar" {checked("pullup_bar", selected_equipment)}> Pull-up Bar</label>
-      <label><input type="checkbox" name="equipment" value="jump_rope" {checked("jump_rope", selected_equipment)}> Jump Rope</label>
-      <label><input type="checkbox" name="equipment" value="bike" {checked("bike", selected_equipment)}> Exercise Bike</label>
-      <label><input type="checkbox" name="equipment" value="rower" {checked("rower", selected_equipment)}> Rower</label>
-      <label><input type="checkbox" name="equipment" value="treadmill" {checked("treadmill", selected_equipment)}> Treadmill</label>
-      <label><input type="checkbox" name="equipment" value="barbell" {checked("barbell", selected_equipment)}> Barbell</label>
-      <label><input type="checkbox" name="equipment" value="squat_rack" {checked("squat_rack", selected_equipment)}> Squat Rack</label>
-      <label><input type="checkbox" name="equipment" value="cable_machine" {checked("cable_machine", selected_equipment)}> Cable Machine</label>
+      <label><input type="checkbox" name="equipment" value="none" {checked("none", equipment)}> None</label>
+      <label><input type="checkbox" name="equipment" value="dumbbells" {checked("dumbbells", equipment)}> Dumbbells</label>
+      <label><input type="checkbox" name="equipment" value="kettlebell" {checked("kettlebell", equipment)}> Kettlebell</label>
+      <label><input type="checkbox" name="equipment" value="resistance_bands" {checked("resistance_bands", equipment)}> Resistance Bands</label>
+      <label><input type="checkbox" name="equipment" value="pullup_bar" {checked("pullup_bar", equipment)}> Pull-up Bar</label>
+      <label><input type="checkbox" name="equipment" value="jump_rope" {checked("jump_rope", equipment)}> Jump Rope</label>
+      <label><input type="checkbox" name="equipment" value="bike" {checked("bike", equipment)}> Exercise Bike</label>
+      <label><input type="checkbox" name="equipment" value="rower" {checked("rower", equipment)}> Rower</label>
+      <label><input type="checkbox" name="equipment" value="treadmill" {checked("treadmill", equipment)}> Treadmill</label>
+      <label><input type="checkbox" name="equipment" value="barbell" {checked("barbell", equipment)}> Barbell</label>
+      <label><input type="checkbox" name="equipment" value="squat_rack" {checked("squat_rack", equipment)}> Squat Rack</label>
+      <label><input type="checkbox" name="equipment" value="bench" {checked("bench", equipment)}> Bench</label>
+      <label><input type="checkbox" name="equipment" value="cable_machine" {checked("cable_machine", equipment)}> Cable Machine</label>
     </div>
 
     <p>
@@ -265,12 +244,5 @@ async def decide(
     equipment: list[str] = Form(default=[]),
     minutes: int = Form(...)
 ):
-    plan, level = build_plan(goal, body_part, equipment, minutes)
-    return render_page(
-        plan=plan,
-        selected_equipment=equipment,
-        selected_body_part=body_part,
-        selected_goal=goal,
-        minutes=minutes,
-        level_label=level,
-    )
+    plan = build_plan(goal, body_part, equipment, minutes)
+    return render_page(plan=plan, goal=goal, body_part=body_part, minutes=minutes, equipment=equipment)
