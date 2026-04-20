@@ -1,12 +1,13 @@
 import json
+from datetime import datetime
 from fastapi import FastAPI, Form
 from fastapi.responses import HTMLResponse
 
 app = FastAPI(title="Free Workout Decider")
 
-# -----------------------------
-# Exercise library (no images)
-# -----------------------------
+# ------------------------------------------------------------
+# Exercise library (no images/videos)
+# ------------------------------------------------------------
 EXERCISES = {
     "full_body": [
         {"id": "pushups", "name": "Push-ups", "default_sets": 3, "default_reps": "10-15", "mins": 6},
@@ -18,7 +19,6 @@ EXERCISES = {
         {"id": "db_row", "name": "Dumbbell Row", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "goblet_squat", "name": "Goblet Squat", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells|kettlebell"]},
         {"id": "kb_swing", "name": "Kettlebell Swing", "default_sets": 4, "default_reps": "12-20", "mins": 10, "needs": ["kettlebell"]},
-        {"id": "barbell_complex", "name": "Barbell Complex", "default_sets": 5, "default_reps": "6 each move", "mins": 15, "needs": ["barbell"]},
     ],
     "upper_body": [
         {"id": "pushups", "name": "Push-ups", "default_sets": 4, "default_reps": "10-15", "mins": 8},
@@ -30,7 +30,6 @@ EXERCISES = {
         {"id": "db_bicep_curl", "name": "Dumbbell Bicep Curl", "default_sets": 3, "default_reps": "10-15", "mins": 8, "needs": ["dumbbells"]},
         {"id": "pullups", "name": "Pull-ups", "default_sets": 4, "default_reps": "AMRAP", "mins": 10, "needs": ["pullup_bar"]},
         {"id": "barbell_row", "name": "Barbell Row", "default_sets": 4, "default_reps": "6-10", "mins": 10, "needs": ["barbell"]},
-        {"id": "bench_press", "name": "Bench Press", "default_sets": 5, "default_reps": "5", "mins": 12, "needs": ["barbell", "bench"]},
     ],
     "lower_body": [
         {"id": "bw_squat", "name": "Bodyweight Squat", "default_sets": 4, "default_reps": "15-20", "mins": 8},
@@ -41,7 +40,6 @@ EXERCISES = {
         {"id": "db_rdl", "name": "Dumbbell Romanian Deadlift", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "back_squat", "name": "Back Squat", "default_sets": 5, "default_reps": "5", "mins": 12, "needs": ["barbell", "squat_rack"]},
         {"id": "deadlift", "name": "Deadlift", "default_sets": 4, "default_reps": "4-6", "mins": 12, "needs": ["barbell"]},
-        {"id": "hip_thrust", "name": "Barbell Hip Thrust", "default_sets": 4, "default_reps": "8-12", "mins": 12, "needs": ["barbell", "bench"]},
     ],
     "core": [
         {"id": "plank", "name": "Plank", "default_sets": 4, "default_reps": "30-60 sec", "mins": 8},
@@ -112,7 +110,6 @@ def render_planner_page(
 
     options_block = ""
     if options:
-        # pass chosen option metadata into /start as JSON
         payload = json.dumps(options).replace('"', "&quot;")
         options_block = f"""
         <form method="post" action="/start" class="card" style="margin-top:1rem;">
@@ -140,6 +137,7 @@ def render_planner_page(
     .equip {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:.4rem; border:1px solid #e2e8f0; border-radius:10px; padding:.75rem; }}
     .grid {{ display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }}
     .exercise-card {{ border:1px solid #e5e7eb; border-radius:10px; padding:.75rem; background:#fff; }}
+    .history-item {{ border:1px solid #e5e7eb; border-radius:8px; padding:.6rem; margin-bottom:.5rem; background:#fff; }}
     input, select, button {{ padding:.5rem; }}
   </style>
 </head>
@@ -180,8 +178,15 @@ def render_planner_page(
 
   {options_block}
 
+  <div class="card" style="margin-top:1rem;">
+    <h2>Workout History</h2>
+    <div id="history-list"></div>
+    <button type="button" id="clear-history-btn">Clear History</button>
+  </div>
+
   <script>
     (function() {{
+      // selected time counter
       var picks = document.querySelectorAll('.pick-box');
       var status = document.getElementById('pick-status');
       var target = {minutes};
@@ -199,10 +204,48 @@ def render_planner_page(
         }}
       }}
 
-      picks.forEach(function(p) {{
-        p.addEventListener('change', updateSelectedTime);
-      }});
+      picks.forEach(function(p) {{ p.addEventListener('change', updateSelectedTime); }});
       updateSelectedTime();
+
+      // history render
+      var historyList = document.getElementById("history-list");
+      var clearBtn = document.getElementById("clear-history-btn");
+
+      function renderHistory() {{
+        if (!historyList) return;
+        var items = [];
+        try {{
+          items = JSON.parse(localStorage.getItem("workout_history") || "[]");
+        }} catch (e) {{
+          items = [];
+        }}
+
+        if (!items.length) {{
+          historyList.innerHTML = "<p>No saved workouts yet.</p>";
+          return;
+        }}
+
+        var html = "";
+        items.slice().reverse().forEach(function(item) {{
+          var ex = (item.exercises || []).join(", ");
+          html += "<div class='history-item'>" +
+                    "<p><strong>Completed:</strong> " + (item.completed_at || "-") + "</p>" +
+                    "<p><strong>Target:</strong> " + item.target_minutes + " min</p>" +
+                    "<p><strong>Actual duration:</strong> " + item.actual_duration + "</p>" +
+                    "<p><strong>Exercises:</strong> " + ex + "</p>" +
+                  "</div>";
+        }});
+        historyList.innerHTML = html;
+      }}
+
+      if (clearBtn) {{
+        clearBtn.addEventListener("click", function() {{
+          localStorage.removeItem("workout_history");
+          renderHistory();
+        }});
+      }}
+
+      renderHistory();
     }})();
   </script>
 </body>
@@ -219,7 +262,6 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
         </body></html>
         """
 
-    # map id->exercise
     by_id = {e["id"]: e for e in payload}
     selected = [by_id[eid] for eid in selected_ids if eid in by_id]
 
@@ -232,21 +274,30 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
         """
 
     rows_html = ""
+    selected_names = [ex["name"] for ex in selected]
+
     for ex_idx, ex in enumerate(selected):
-        set_items = ""
         sets = max(1, int(ex.get("default_sets", 3)))
         reps_default = ex.get("default_reps", "10")
 
+        set_items = ""
         for set_idx in range(1, sets + 1):
             set_id = f"{ex_idx}-{set_idx}"
             set_items += f"""
             <div class="set-item">
               <label><input type="checkbox" class="set-done" data-setid="{set_id}" data-rest="60"> Set {set_idx}</label>
               <label>Reps done: <input type="number" min="0" value="0" class="set-reps"></label>
+
+              <label>Custom rest (sec):
+                <input type="number" min="5" value="60" class="custom-rest-input" id="custom-rest-{set_id}">
+              </label>
+
               <span id="rest-{set_id}" class="set-timer">00:00</span>
+
               <button type="button" onclick="startSetRest('{set_id}', 30)">30s</button>
               <button type="button" onclick="startSetRest('{set_id}', 60)">60s</button>
               <button type="button" onclick="startSetRest('{set_id}', 90)">90s</button>
+              <button type="button" onclick="startCustomRest('{set_id}')">Custom</button>
               <button type="button" onclick="stopSetRest('{set_id}')">Stop</button>
             </div>
             """
@@ -259,6 +310,9 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
         </div>
         """
 
+    exercises_json = json.dumps(selected_names).replace('"', "&quot;")
+    started_at = datetime.utcnow().isoformat()
+
     return f"""
 <!doctype html>
 <html>
@@ -267,10 +321,10 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Workout Session</title>
   <style>
-    body {{ font-family: Arial, sans-serif; max-width: 950px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
+    body {{ font-family: Arial, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
     .session-card {{ background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:1rem; margin-bottom:1rem; }}
     .set-list {{ display:grid; gap:.6rem; }}
-    .set-item {{ display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; border:1px solid #e5e7eb; border-radius:8px; padding:.5rem; }}
+    .set-item {{ display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; border:1px solid #e5e7eb; border-radius:8px; padding:.5rem; }}
     .set-timer {{ font-family:monospace; font-weight:700; min-width:60px; }}
     .workout-timer {{ font-family:monospace; font-weight:700; font-size:1.2rem; margin-left:.5rem; }}
     button, input {{ padding:.45rem; }}
@@ -284,6 +338,7 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
     <button type="button" id="start-workout-btn">▶ Start Workout</button>
     <button type="button" id="pause-workout-btn">⏸ Pause</button>
     <button type="button" id="reset-workout-btn">↺ Reset</button>
+    <button type="button" id="complete-workout-btn">✅ Complete & Save Workout</button>
     <span id="workout-countdown" class="workout-timer">00:00</span>
   </div>
 
@@ -295,15 +350,17 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
 
   <script>
     (function() {{
-      // global workout timer
       var totalSeconds = {max(1, target_minutes)} * 60;
       var remaining = totalSeconds;
       var workoutInterval = null;
+      var startedAt = "{started_at}";
+      var hasStarted = false;
 
       var display = document.getElementById("workout-countdown");
       var startBtn = document.getElementById("start-workout-btn");
       var pauseBtn = document.getElementById("pause-workout-btn");
       var resetBtn = document.getElementById("reset-workout-btn");
+      var completeBtn = document.getElementById("complete-workout-btn");
 
       function fmt(sec) {{
         var m = String(Math.floor(sec / 60)).padStart(2, "0");
@@ -319,6 +376,7 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
       if (startBtn) {{
         startBtn.addEventListener("click", function() {{
           if (workoutInterval) return;
+          hasStarted = true;
           workoutInterval = setInterval(function() {{
             remaining -= 1;
             updateDisplay();
@@ -347,6 +405,7 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
             workoutInterval = null;
           }}
           remaining = totalSeconds;
+          hasStarted = false;
           updateDisplay();
         }});
       }}
@@ -365,8 +424,8 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
         var left = seconds;
         var el = document.getElementById("rest-" + setId);
         if (!el) return;
-
         el.textContent = setFmt(left);
+
         setTimers[setId] = setInterval(function() {{
           left -= 1;
           el.textContent = setFmt(Math.max(left, 0));
@@ -387,7 +446,17 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
         if (el) el.textContent = "00:00";
       }};
 
-      // auto-start rest on set check
+      window.startCustomRest = function(setId) {{
+        var input = document.getElementById("custom-rest-" + setId);
+        var sec = 60;
+        if (input && input.value) {{
+          sec = Number(input.value);
+        }}
+        if (!sec || sec < 5) sec = 5;
+        window.startSetRest(setId, sec);
+      }};
+
+      // auto-start 60s rest when a set is checked
       var setChecks = document.querySelectorAll(".set-done");
       setChecks.forEach(function(cb) {{
         cb.addEventListener("change", function() {{
@@ -399,6 +468,46 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
           }}
         }});
       }});
+
+      // save workout to localStorage history
+      if (completeBtn) {{
+        completeBtn.addEventListener("click", function() {{
+          if (workoutInterval) {{
+            clearInterval(workoutInterval);
+            workoutInterval = null;
+          }}
+
+          var now = new Date();
+          var completedAt = now.toLocaleString();
+          var actualSeconds = totalSeconds - remaining;
+          if (!hasStarted) actualSeconds = 0;
+
+          var mins = Math.floor(actualSeconds / 60);
+          var secs = actualSeconds % 60;
+          var actualDuration = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+
+          var item = {{
+            completed_at: completedAt,
+            completed_at_iso: now.toISOString(),
+            started_at_utc: startedAt,
+            target_minutes: {max(1, target_minutes)},
+            actual_duration: actualDuration,
+            exercises: {exercises_json}
+          }};
+
+          var history = [];
+          try {{
+            history = JSON.parse(localStorage.getItem("workout_history") || "[]");
+          }} catch (e) {{
+            history = [];
+          }}
+
+          history.push(item);
+          localStorage.setItem("workout_history", JSON.stringify(history));
+
+          alert("Workout saved! You can view it on the planner page history.");
+        }});
+      }}
     }})();
   </script>
 </body>
