@@ -5,9 +5,6 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI(title="Free Workout Decider")
 
-# ------------------------------------------------------------
-# Exercise library (no images/videos)
-# ------------------------------------------------------------
 EXERCISES = {
     "full_body": [
         {"id": "pushups", "name": "Push-ups", "default_sets": 3, "default_reps": "10-15", "mins": 6},
@@ -15,7 +12,6 @@ EXERCISES = {
         {"id": "walking_lunge", "name": "Walking Lunge", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
         {"id": "mountain_climbers", "name": "Mountain Climbers", "default_sets": 3, "default_reps": "30-45 sec", "mins": 6},
         {"id": "burpees", "name": "Burpees", "default_sets": 3, "default_reps": "8-12", "mins": 8},
-        {"id": "db_thruster", "name": "Dumbbell Thruster", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "db_row", "name": "Dumbbell Row", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "goblet_squat", "name": "Goblet Squat", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells|kettlebell"]},
         {"id": "kb_swing", "name": "Kettlebell Swing", "default_sets": 4, "default_reps": "12-20", "mins": 10, "needs": ["kettlebell"]},
@@ -23,13 +19,10 @@ EXERCISES = {
     "upper_body": [
         {"id": "pushups", "name": "Push-ups", "default_sets": 4, "default_reps": "10-15", "mins": 8},
         {"id": "diamond_pushups", "name": "Diamond Push-ups", "default_sets": 3, "default_reps": "8-12", "mins": 7},
-        {"id": "pike_pushups", "name": "Pike Push-ups", "default_sets": 3, "default_reps": "8-12", "mins": 7},
-        {"id": "chair_dips", "name": "Chair Dips", "default_sets": 3, "default_reps": "10-15", "mins": 7},
         {"id": "db_bench", "name": "Dumbbell Bench Press", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "db_shoulder_press", "name": "Dumbbell Shoulder Press", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "db_bicep_curl", "name": "Dumbbell Bicep Curl", "default_sets": 3, "default_reps": "10-15", "mins": 8, "needs": ["dumbbells"]},
         {"id": "pullups", "name": "Pull-ups", "default_sets": 4, "default_reps": "AMRAP", "mins": 10, "needs": ["pullup_bar"]},
-        {"id": "barbell_row", "name": "Barbell Row", "default_sets": 4, "default_reps": "6-10", "mins": 10, "needs": ["barbell"]},
     ],
     "lower_body": [
         {"id": "bw_squat", "name": "Bodyweight Squat", "default_sets": 4, "default_reps": "15-20", "mins": 8},
@@ -38,8 +31,6 @@ EXERCISES = {
         {"id": "step_ups", "name": "Step-ups", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
         {"id": "goblet_squat", "name": "Goblet Squat", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells|kettlebell"]},
         {"id": "db_rdl", "name": "Dumbbell Romanian Deadlift", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
-        {"id": "back_squat", "name": "Back Squat", "default_sets": 5, "default_reps": "5", "mins": 12, "needs": ["barbell", "squat_rack"]},
-        {"id": "deadlift", "name": "Deadlift", "default_sets": 4, "default_reps": "4-6", "mins": 12, "needs": ["barbell"]},
     ],
     "core": [
         {"id": "plank", "name": "Plank", "default_sets": 4, "default_reps": "30-60 sec", "mins": 8},
@@ -47,7 +38,6 @@ EXERCISES = {
         {"id": "deadbug", "name": "Dead Bug", "default_sets": 3, "default_reps": "10 each side", "mins": 6},
         {"id": "bicycle_crunch", "name": "Bicycle Crunch", "default_sets": 3, "default_reps": "20 total", "mins": 6},
         {"id": "leg_raises", "name": "Leg Raises", "default_sets": 3, "default_reps": "10-15", "mins": 7},
-        {"id": "cable_crunch", "name": "Cable Crunch", "default_sets": 4, "default_reps": "12-15", "mins": 9, "needs": ["cable_machine"]},
     ],
 }
 
@@ -155,7 +145,7 @@ def render_planner_page(
       </select>
     </p>
 
-    <p><strong>Equipment (select all you have)</strong></p>
+    <p><strong>Equipment</strong></p>
     <div class="equip">
       <label><input type="checkbox" name="equipment" value="none" {checked("none", equipment)}> None</label>
       <label><input type="checkbox" name="equipment" value="dumbbells" {checked("dumbbells", equipment)}> Dumbbells</label>
@@ -186,7 +176,6 @@ def render_planner_page(
 
   <script>
     (function() {{
-      // selected time counter
       var picks = document.querySelectorAll('.pick-box');
       var status = document.getElementById('pick-status');
       var target = {minutes};
@@ -207,7 +196,6 @@ def render_planner_page(
       picks.forEach(function(p) {{ p.addEventListener('change', updateSelectedTime); }});
       updateSelectedTime();
 
-      // history render
       var historyList = document.getElementById("history-list");
       var clearBtn = document.getElementById("clear-history-btn");
 
@@ -285,15 +273,12 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
             set_id = f"{ex_idx}-{set_idx}"
             set_items += f"""
             <div class="set-item">
-              <label><input type="checkbox" class="set-done" data-setid="{set_id}" data-rest="60"> Set {set_idx}</label>
+              <label><input type="checkbox" class="set-done" data-setid="{set_id}"> Set {set_idx}</label>
               <label>Reps done: <input type="number" min="0" value="0" class="set-reps"></label>
-
               <label>Custom rest (sec):
                 <input type="number" min="5" value="60" class="custom-rest-input" id="custom-rest-{set_id}">
               </label>
-
               <span id="rest-{set_id}" class="set-timer">00:00</span>
-
               <button type="button" onclick="startSetRest('{set_id}', 30)">30s</button>
               <button type="button" onclick="startSetRest('{set_id}', 60)">60s</button>
               <button type="button" onclick="startSetRest('{set_id}', 90)">90s</button>
@@ -310,7 +295,8 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
         </div>
         """
 
-    exercises_json = json.dumps(selected_names).replace('"', "&quot;")
+    # IMPORTANT: keep as valid JS array string (NO &quot; replacement here)
+    exercises_json = json.dumps(selected_names)
     started_at = datetime.utcnow().isoformat()
 
     return f"""
@@ -410,7 +396,6 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
         }});
       }}
 
-      // per-set rest timers
       var setTimers = {{}};
 
       function setFmt(sec) {{
@@ -449,14 +434,11 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
       window.startCustomRest = function(setId) {{
         var input = document.getElementById("custom-rest-" + setId);
         var sec = 60;
-        if (input && input.value) {{
-          sec = Number(input.value);
-        }}
+        if (input && input.value) sec = Number(input.value);
         if (!sec || sec < 5) sec = 5;
         window.startSetRest(setId, sec);
       }};
 
-      // auto-start 60s rest when a set is checked
       var setChecks = document.querySelectorAll(".set-done");
       setChecks.forEach(function(cb) {{
         cb.addEventListener("change", function() {{
@@ -469,7 +451,6 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
         }});
       }});
 
-      // save workout to localStorage history
       if (completeBtn) {{
         completeBtn.addEventListener("click", function() {{
           if (workoutInterval) {{
@@ -504,8 +485,7 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
 
           history.push(item);
           localStorage.setItem("workout_history", JSON.stringify(history));
-
-          alert("Workout saved! You can view it on the planner page history.");
+          alert("Workout saved! Go back to planner to view history.");
         }});
       }}
     }})();
