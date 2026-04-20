@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI(title="Free Workout Decider")
 
-RULES = {
+WORKOUT_RULES = {
     "strength": {
         "none": "Bodyweight Circuit (Push-ups, Squats, Plank, Glute Bridges)",
         "basic": "Dumbbell Full-Body Strength (Goblet Squat, Rows, Press)",
@@ -21,50 +21,110 @@ RULES = {
     },
 }
 
-def decide(goal: str, equipment: str, minutes: int) -> str:
-    goal = goal if goal in RULES else "strength"
-    equipment = equipment if equipment in RULES[goal] else "none"
-    workout = RULES[goal][equipment]
+FULL_GYM = {"barbell", "squat_rack", "cable_machine"}
+BASIC = {
+    "dumbbells", "kettlebell", "resistance_bands", "pullup_bar",
+    "bench", "bike", "rower", "treadmill", "jump_rope"
+}
+
+
+def equipment_level(items: list[str]) -> str:
+    normalized = {x.strip().lower() for x in items if x.strip()}
+    if not normalized or normalized == {"none"}:
+        return "none"
+    if normalized & FULL_GYM:
+        return "full"
+    if normalized & BASIC:
+        return "basic"
+    return "none"
+
+
+def decide_workout(goal: str, equipment_items: list[str], minutes: int) -> str:
+    goal = goal if goal in WORKOUT_RULES else "strength"
+    level = equipment_level(equipment_items)
+    workout = WORKOUT_RULES[goal][level]
     minutes = max(1, minutes)
+
     if minutes < 20:
         return f"Quick {minutes}-Minute Version: {workout}"
     if minutes <= 45:
         return f"Standard {minutes}-Minute Session: {workout}"
     return f"Extended {minutes}-Minute Session: {workout} + mobility cooldown"
 
+
+def checked(value: str, selected: list[str]) -> str:
+    return "checked" if value in selected else ""
+
+
+def render_page(recommendation: str | None = None, selected: list[str] | None = None) -> str:
+    selected = selected or []
+    return f"""
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Free Workout Decider</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
+    .card {{ background:#fff; border-radius:12px; padding:1rem; box-shadow:0 8px 24px rgba(0,0,0,.08); }}
+    .equip {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.4rem; border:1px solid #e2e8f0; border-radius:10px; padding:.75rem; }}
+    input, select, button {{ padding:.55rem; margin-top:.25rem; }}
+    button {{ background:#2563eb; color:white; border:none; border-radius:8px; cursor:pointer; }}
+  </style>
+</head>
+<body>
+  <h1>Free Workout Decider</h1>
+  <p>A free, logic-based workout recommendation tool.</p>
+
+  <form method="post" action="/decide" class="card">
+    <label>Primary Goal</label><br/>
+    <select name="goal" required>
+      <option value="strength">Build Strength</option>
+      <option value="fat_loss">Fat Loss</option>
+      <option value="endurance">Endurance</option>
+    </select>
+
+    <p><strong>Equipment Available (select all that apply)</strong></p>
+    <div class="equip">
+      <label><input type="checkbox" name="equipment" value="none" {checked("none", selected)}> None</label>
+      <label><input type="checkbox" name="equipment" value="dumbbells" {checked("dumbbells", selected)}> Dumbbells</label>
+      <label><input type="checkbox" name="equipment" value="kettlebell" {checked("kettlebell", selected)}> Kettlebell</label>
+      <label><input type="checkbox" name="equipment" value="resistance_bands" {checked("resistance_bands", selected)}> Resistance Bands</label>
+      <label><input type="checkbox" name="equipment" value="pullup_bar" {checked("pullup_bar", selected)}> Pull-up Bar</label>
+      <label><input type="checkbox" name="equipment" value="jump_rope" {checked("jump_rope", selected)}> Jump Rope</label>
+      <label><input type="checkbox" name="equipment" value="bike" {checked("bike", selected)}> Exercise Bike</label>
+      <label><input type="checkbox" name="equipment" value="rower" {checked("rower", selected)}> Rower</label>
+      <label><input type="checkbox" name="equipment" value="treadmill" {checked("treadmill", selected)}> Treadmill</label>
+      <label><input type="checkbox" name="equipment" value="barbell" {checked("barbell", selected)}> Barbell</label>
+      <label><input type="checkbox" name="equipment" value="squat_rack" {checked("squat_rack", selected)}> Squat Rack</label>
+      <label><input type="checkbox" name="equipment" value="cable_machine" {checked("cable_machine", selected)}> Cable Machine</label>
+    </div>
+
+    <p>
+      <label>Minutes Available</label><br/>
+      <input type="number" name="minutes" min="10" max="120" value="30" required />
+    </p>
+
+    <button type="submit">Get Workout</button>
+  </form>
+
+  {f'<div class="card" style="margin-top:1rem;"><h2>Your Recommendation</h2><p>{recommendation}</p></div>' if recommendation else ''}
+</body>
+</html>
+"""
+
+
 @app.get("/", response_class=HTMLResponse)
 async def home():
-    return """
-    <html><body style="font-family:Arial;max-width:700px;margin:40px auto;">
-      <h1>Free Workout Decider</h1>
-      <form method="post" action="/decide">
-        <p>Goal:
-          <select name="goal">
-            <option value="strength">Build Strength</option>
-            <option value="fat_loss">Fat Loss</option>
-            <option value="endurance">Endurance</option>
-          </select>
-        </p>
-        <p>Equipment:
-          <select name="equipment">
-            <option value="none">None</option>
-            <option value="basic">Basic</option>
-            <option value="full">Full Gym</option>
-          </select>
-        </p>
-        <p>Minutes: <input type="number" name="minutes" value="30" min="1"></p>
-        <button type="submit">Get Workout</button>
-      </form>
-    </body></html>
-    """
+    return render_page()
+
 
 @app.post("/decide", response_class=HTMLResponse)
-async def decide_post(goal: str = Form(...), equipment: str = Form(...), minutes: int = Form(...)):
-    recommendation = decide(goal, equipment, minutes)
-    return f"""
-    <html><body style="font-family:Arial;max-width:700px;margin:40px auto;">
-      <h1>Your Recommendation</h1>
-      <p>{recommendation}</p>
-      <p><a href="/">← Back</a></p>
-    </body></html>
-    """
+async def decide(
+    goal: str = Form(...),
+    equipment: list[str] = Form(default=[]),
+    minutes: int = Form(...)
+):
+    recommendation = decide_workout(goal, equipment, minutes)
+    return render_page(recommendation=recommendation, selected=equipment)
