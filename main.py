@@ -10,15 +10,12 @@ EXERCISES = {
         {"id": "pushups", "name": "Push-ups", "default_sets": 3, "default_reps": "10-15", "mins": 6},
         {"id": "bw_squat", "name": "Bodyweight Squat", "default_sets": 3, "default_reps": "15-20", "mins": 6},
         {"id": "walking_lunge", "name": "Walking Lunge", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
-        {"id": "mountain_climbers", "name": "Mountain Climbers", "default_sets": 3, "default_reps": "30-45 sec", "mins": 6},
-        {"id": "burpees", "name": "Burpees", "default_sets": 3, "default_reps": "8-12", "mins": 8},
         {"id": "db_row", "name": "Dumbbell Row", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "goblet_squat", "name": "Goblet Squat", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells|kettlebell"]},
         {"id": "kb_swing", "name": "Kettlebell Swing", "default_sets": 4, "default_reps": "12-20", "mins": 10, "needs": ["kettlebell"]},
     ],
     "upper_body": [
         {"id": "pushups", "name": "Push-ups", "default_sets": 4, "default_reps": "10-15", "mins": 8},
-        {"id": "diamond_pushups", "name": "Diamond Push-ups", "default_sets": 3, "default_reps": "8-12", "mins": 7},
         {"id": "db_bench", "name": "Dumbbell Bench Press", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "db_shoulder_press", "name": "Dumbbell Shoulder Press", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "db_bicep_curl", "name": "Dumbbell Bicep Curl", "default_sets": 3, "default_reps": "10-15", "mins": 8, "needs": ["dumbbells"]},
@@ -30,7 +27,6 @@ EXERCISES = {
         {"id": "glute_bridge", "name": "Glute Bridge", "default_sets": 4, "default_reps": "12-20", "mins": 8},
         {"id": "step_ups", "name": "Step-ups", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
         {"id": "goblet_squat", "name": "Goblet Squat", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells|kettlebell"]},
-        {"id": "db_rdl", "name": "Dumbbell Romanian Deadlift", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
     ],
     "core": [
         {"id": "plank", "name": "Plank", "default_sets": 4, "default_reps": "30-60 sec", "mins": 8},
@@ -48,7 +44,6 @@ def has_equipment(exercise: dict, selected: list[str]) -> bool:
         return True
 
     selected_set = {x.strip().lower() for x in selected if x.strip() and x.lower() != "none"}
-
     for rule in needs:
         if "|" in rule:
             options = set(rule.split("|"))
@@ -75,28 +70,22 @@ def checked(value: str, selected: list[str]) -> str:
     return "checked" if value in selected else ""
 
 
-def render_planner_page(
-    options: list[dict] | None = None,
-    body_part: str = "full_body",
-    minutes: int = 30,
-    equipment: list[str] | None = None,
-) -> str:
-    equipment = equipment or []
+def render_planner_page(options=None, body_part="full_body", minutes=30, equipment=None):
     options = options or []
+    equipment = equipment or []
 
-    option_cards = ""
-    if options:
-        for ex in options:
-            option_cards += f"""
-            <div class="exercise-card">
-              <label>
-                <input type="checkbox" name="selected_exercises" value="{ex['id']}" class="pick-box" data-mins="{ex['mins']}">
-                <strong>{ex['name']}</strong>
-              </label>
-              <p>Suggested: {ex['default_sets']} sets x {ex['default_reps']}</p>
-              <p>Estimated time: ~{ex['mins']} min</p>
-            </div>
-            """
+    cards = ""
+    for ex in options:
+        cards += f"""
+        <div class="exercise-card">
+          <label>
+            <input type="checkbox" name="selected_exercises" value="{ex['id']}" class="pick-box" data-mins="{ex['mins']}">
+            <strong>{ex['name']}</strong>
+          </label>
+          <p>Suggested: {ex['default_sets']} sets x {ex['default_reps']}</p>
+          <p>Estimated time: ~{ex['mins']} min</p>
+        </div>
+        """
 
     options_block = ""
     if options:
@@ -106,8 +95,7 @@ def render_planner_page(
           <h2>Select Exercises</h2>
           <p><strong>Target time:</strong> {minutes} min</p>
           <p id="pick-status"><strong>Selected time:</strong> 0 min</p>
-          <div class="grid">{option_cards}</div>
-
+          <div class="grid">{cards}</div>
           <input type="hidden" name="target_minutes" value="{minutes}">
           <input type="hidden" name="exercise_payload" value="{payload}">
           <button type="submit" style="margin-top:1rem;">Start Workout</button>
@@ -120,14 +108,15 @@ def render_planner_page(
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Free Workout Decider</title>
+  <title>Workout Decider</title>
   <style>
     body {{ font-family: Arial, sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
     .card {{ background:#fff; border-radius:12px; padding:1rem; box-shadow:0 8px 24px rgba(0,0,0,.08); }}
     .equip {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:.4rem; border:1px solid #e2e8f0; border-radius:10px; padding:.75rem; }}
     .grid {{ display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }}
     .exercise-card {{ border:1px solid #e5e7eb; border-radius:10px; padding:.75rem; background:#fff; }}
-    .history-item {{ border:1px solid #e5e7eb; border-radius:8px; padding:.6rem; margin-bottom:.5rem; background:#fff; }}
+    .history-item {{ border:1px solid #e5e7eb; border-radius:8px; padding:.6rem; margin-bottom:.6rem; background:#fff; }}
+    .history-ex {{ margin: .4rem 0 .2rem 1rem; }}
     input, select, button {{ padding:.5rem; }}
   </style>
 </head>
@@ -169,15 +158,16 @@ def render_planner_page(
   {options_block}
 
   <div class="card" style="margin-top:1rem;">
-    <h2>Workout History</h2>
+    <h2>Past Workouts</h2>
     <div id="history-list"></div>
     <button type="button" id="clear-history-btn">Clear History</button>
   </div>
 
   <script>
     (function() {{
-      var picks = document.querySelectorAll('.pick-box');
-      var status = document.getElementById('pick-status');
+      // selected-time counter
+      var picks = document.querySelectorAll(".pick-box");
+      var status = document.getElementById("pick-status");
       var target = {minutes};
 
       function updateSelectedTime() {{
@@ -192,10 +182,10 @@ def render_planner_page(
           status.innerHTML = "<strong>Selected time:</strong> " + total + " min (need " + (target - total) + " more)";
         }}
       }}
-
-      picks.forEach(function(p) {{ p.addEventListener('change', updateSelectedTime); }});
+      picks.forEach(function(p) {{ p.addEventListener("change", updateSelectedTime); }});
       updateSelectedTime();
 
+      // history render with detailed exercise logs
       var historyList = document.getElementById("history-list");
       var clearBtn = document.getElementById("clear-history-btn");
 
@@ -215,14 +205,22 @@ def render_planner_page(
 
         var html = "";
         items.slice().reverse().forEach(function(item) {{
-          var ex = (item.exercises || []).join(", ");
+          var exHtml = "";
+          (item.exercise_logs || []).forEach(function(ex) {{
+            exHtml += "<div class='history-ex'>" +
+                        "<p><strong>" + ex.name + "</strong></p>" +
+                        "<p>Planned sets: " + ex.planned_sets + " | Completed sets: " + ex.completed_sets + "</p>" +
+                        "<p>Reps by set: " + (ex.reps_by_set || []).join(", ") + "</p>" +
+                      "</div>";
+          }});
+
           html += "<div class='history-item'>" +
                     "<p><strong>Completed:</strong> " + (item.completed_at || "-") + "</p>" +
-                    "<p><strong>Target:</strong> " + item.target_minutes + " min</p>" +
-                    "<p><strong>Actual duration:</strong> " + item.actual_duration + "</p>" +
-                    "<p><strong>Exercises:</strong> " + ex + "</p>" +
+                    "<p><strong>Target:</strong> " + item.target_minutes + " min | <strong>Actual:</strong> " + item.actual_duration + "</p>" +
+                    exHtml +
                   "</div>";
         }});
+
         historyList.innerHTML = html;
       }}
 
@@ -241,7 +239,7 @@ def render_planner_page(
     """
 
 
-def render_session_page(selected_ids: list[str], payload: list[dict], target_minutes: int) -> str:
+def render_session_page(selected_ids, payload, target_minutes):
     if not selected_ids:
         return """
         <html><body style='font-family:Arial;padding:2rem;'>
@@ -252,51 +250,44 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
 
     by_id = {e["id"]: e for e in payload}
     selected = [by_id[eid] for eid in selected_ids if eid in by_id]
-
     if not selected:
         return """
         <html><body style='font-family:Arial;padding:2rem;'>
-          <h2>Selected exercises were not found.</h2>
-          <p><a href='/'>Go back to planner.</a></p>
+          <h2>Selected exercises not found.</h2>
+          <p><a href='/'>Back</a></p>
         </body></html>
         """
 
-    rows_html = ""
-    selected_names = [ex["name"] for ex in selected]
-
+    rows = ""
     for ex_idx, ex in enumerate(selected):
         sets = max(1, int(ex.get("default_sets", 3)))
         reps_default = ex.get("default_reps", "10")
+        set_rows = ""
 
-        set_items = ""
-        for set_idx in range(1, sets + 1):
-            set_id = f"{ex_idx}-{set_idx}"
-            set_items += f"""
+        for s in range(1, sets + 1):
+            sid = f"{ex_idx}-{s}"
+            set_rows += f"""
             <div class="set-item">
-              <label><input type="checkbox" class="set-done" data-setid="{set_id}"> Set {set_idx}</label>
+              <label><input type="checkbox" class="set-done" data-setid="{sid}"> Set {s}</label>
               <label>Reps done: <input type="number" min="0" value="0" class="set-reps"></label>
-              <label>Custom rest (sec):
-                <input type="number" min="5" value="60" class="custom-rest-input" id="custom-rest-{set_id}">
-              </label>
-              <span id="rest-{set_id}" class="set-timer">00:00</span>
-              <button type="button" onclick="startSetRest('{set_id}', 30)">30s</button>
-              <button type="button" onclick="startSetRest('{set_id}', 60)">60s</button>
-              <button type="button" onclick="startSetRest('{set_id}', 90)">90s</button>
-              <button type="button" onclick="startCustomRest('{set_id}')">Custom</button>
-              <button type="button" onclick="stopSetRest('{set_id}')">Stop</button>
+              <label>Custom rest (sec): <input type="number" min="5" value="60" id="custom-rest-{sid}" class="custom-rest-input"></label>
+              <span id="rest-{sid}" class="set-timer">00:00</span>
+              <button type="button" onclick="startSetRest('{sid}', 30)">30s</button>
+              <button type="button" onclick="startSetRest('{sid}', 60)">60s</button>
+              <button type="button" onclick="startSetRest('{sid}', 90)">90s</button>
+              <button type="button" onclick="startCustomRest('{sid}')">Custom</button>
+              <button type="button" onclick="stopSetRest('{sid}')">Stop</button>
             </div>
             """
 
-        rows_html += f"""
-        <div class="session-card">
+        rows += f"""
+        <div class="session-card" data-exercise-name="{ex['name']}" data-planned-sets="{sets}">
           <h3>{ex["name"]}</h3>
           <p><strong>Suggested:</strong> {sets} sets x {reps_default}</p>
-          <div class="set-list">{set_items}</div>
+          <div class="set-list">{set_rows}</div>
         </div>
         """
 
-    # IMPORTANT: keep as valid JS array string (NO &quot; replacement here)
-    exercises_json = json.dumps(selected_names)
     started_at = datetime.utcnow().isoformat()
 
     return f"""
@@ -320,7 +311,7 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
   <h1>Workout Session</h1>
   <p><strong>Target time:</strong> {target_minutes} min</p>
 
-  <div style="margin: .8rem 0 1rem 0;">
+  <div style="margin:.8rem 0 1rem 0;">
     <button type="button" id="start-workout-btn">▶ Start Workout</button>
     <button type="button" id="pause-workout-btn">⏸ Pause</button>
     <button type="button" id="reset-workout-btn">↺ Reset</button>
@@ -328,9 +319,9 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
     <span id="workout-countdown" class="workout-timer">00:00</span>
   </div>
 
-  <p>Check sets one-by-one. Checking a set auto-starts a 60s rest timer.</p>
+  <p>Check sets as completed. Rest timers start only when you click a rest button.</p>
 
-  {rows_html}
+  {rows}
 
   <p><a href="/">← Back to planner</a></p>
 
@@ -339,8 +330,8 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
       var totalSeconds = {max(1, target_minutes)} * 60;
       var remaining = totalSeconds;
       var workoutInterval = null;
-      var startedAt = "{started_at}";
       var hasStarted = false;
+      var startedAt = "{started_at}";
 
       var display = document.getElementById("workout-countdown");
       var startBtn = document.getElementById("start-workout-btn");
@@ -369,7 +360,7 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
             if (remaining <= 0) {{
               clearInterval(workoutInterval);
               workoutInterval = null;
-              if (display) display.textContent = "DONE ✅";
+              display.textContent = "DONE ✅";
             }}
           }}, 1000);
         }});
@@ -396,9 +387,10 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
         }});
       }}
 
+      // rest timers (manual start only)
       var setTimers = {{}};
 
-      function setFmt(sec) {{
+      function fmtRest(sec) {{
         var m = String(Math.floor(sec / 60)).padStart(2, "0");
         var s = String(sec % 60).padStart(2, "0");
         return m + ":" + s;
@@ -409,11 +401,11 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
         var left = seconds;
         var el = document.getElementById("rest-" + setId);
         if (!el) return;
-        el.textContent = setFmt(left);
 
+        el.textContent = fmtRest(left);
         setTimers[setId] = setInterval(function() {{
           left -= 1;
-          el.textContent = setFmt(Math.max(left, 0));
+          el.textContent = fmtRest(Math.max(left, 0));
           if (left <= 0) {{
             clearInterval(setTimers[setId]);
             delete setTimers[setId];
@@ -439,18 +431,7 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
         window.startSetRest(setId, sec);
       }};
 
-      var setChecks = document.querySelectorAll(".set-done");
-      setChecks.forEach(function(cb) {{
-        cb.addEventListener("change", function() {{
-          var setId = cb.getAttribute("data-setid");
-          if (cb.checked) {{
-            window.startSetRest(setId, 60);
-          }} else {{
-            window.stopSetRest(setId);
-          }}
-        }});
-      }});
-
+      // save workout with detailed logs
       if (completeBtn) {{
         completeBtn.addEventListener("click", function() {{
           if (workoutInterval) {{
@@ -460,12 +441,38 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
 
           var now = new Date();
           var completedAt = now.toLocaleString();
-          var actualSeconds = totalSeconds - remaining;
-          if (!hasStarted) actualSeconds = 0;
 
+          var actualSeconds = hasStarted ? (totalSeconds - remaining) : 0;
           var mins = Math.floor(actualSeconds / 60);
           var secs = actualSeconds % 60;
           var actualDuration = String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+
+          var cards = document.querySelectorAll(".session-card");
+          var exerciseLogs = [];
+
+          cards.forEach(function(card) {{
+            var name = card.getAttribute("data-exercise-name") || "Exercise";
+            var plannedSets = Number(card.getAttribute("data-planned-sets") || 0);
+
+            var setChecks = card.querySelectorAll(".set-done");
+            var repInputs = card.querySelectorAll(".set-reps");
+
+            var completedSets = 0;
+            var repsBySet = [];
+
+            setChecks.forEach(function(cb, idx) {{
+              if (cb.checked) completedSets += 1;
+              var repsVal = repInputs[idx] ? repInputs[idx].value : "";
+              repsBySet.push(repsVal || "0");
+            }});
+
+            exerciseLogs.push({{
+              name: name,
+              planned_sets: plannedSets,
+              completed_sets: completedSets,
+              reps_by_set: repsBySet
+            }});
+          }});
 
           var item = {{
             completed_at: completedAt,
@@ -473,7 +480,7 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
             started_at_utc: startedAt,
             target_minutes: {max(1, target_minutes)},
             actual_duration: actualDuration,
-            exercises: {exercises_json}
+            exercise_logs: exerciseLogs
           }};
 
           var history = [];
@@ -482,10 +489,10 @@ def render_session_page(selected_ids: list[str], payload: list[dict], target_min
           }} catch (e) {{
             history = [];
           }}
-
           history.push(item);
           localStorage.setItem("workout_history", JSON.stringify(history));
-          alert("Workout saved! Go back to planner to view history.");
+
+          alert("Workout saved with detailed exercise logs.");
         }});
       }}
     }})();
