@@ -3,113 +3,69 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI(title="Free Workout Decider")
 
-# ----------------------------
-# Exercise library
-# ----------------------------
-# equipment rules:
-# - [] means no equipment needed
-# - ["dumbbells"] means must have dumbbells
-# - ["barbell", "squat_rack"] means must have both
-# - ["bike|treadmill|rower"] means one of those is enough
+# ---------------------------------
+# Exercise Library (estimated minutes per set included)
+# ---------------------------------
 EXERCISES = {
     "upper_body": [
-        {"name": "Push-ups", "sets": "4", "reps": "10-15", "equipment": [], "video_id": "IODxDxX7oi4"},
-        {"name": "Pike Push-ups", "sets": "3", "reps": "8-12", "equipment": [], "video_id": "qHQ_E-f5278"},
-        {"name": "Dumbbell Bench Press", "sets": "4", "reps": "8-12", "equipment": ["dumbbells"], "video_id": "VmB1G1K7v94"},
-        {"name": "One-Arm Dumbbell Row", "sets": "4", "reps": "8-12 each", "equipment": ["dumbbells"], "video_id": "pYcpY20QaE8"},
-        {"name": "Barbell Bench Press", "sets": "4", "reps": "5-8", "equipment": ["barbell", "bench"], "video_id": "rT7DgCr-3pg"},
-        {"name": "Overhead Press", "sets": "3", "reps": "6-10", "equipment": ["barbell"], "video_id": "2yjwXTZQDDI"},
+        {"name": "Push-ups", "equipment": [], "sets": 4, "reps": "10-15", "mins_per_set": 2, "video_id": "IODxDxX7oi4"},
+        {"name": "Pike Push-ups", "equipment": [], "sets": 3, "reps": "8-12", "mins_per_set": 2, "video_id": "qHQ_E-f5278"},
+        {"name": "Dumbbell Bench Press", "equipment": ["dumbbells"], "sets": 4, "reps": "8-12", "mins_per_set": 3, "video_id": "VmB1G1K7v94"},
+        {"name": "One-Arm DB Row", "equipment": ["dumbbells"], "sets": 4, "reps": "8-12 each", "mins_per_set": 3, "video_id": "pYcpY20QaE8"},
+        {"name": "Barbell Bench Press", "equipment": ["barbell", "bench"], "sets": 4, "reps": "5-8", "mins_per_set": 3, "video_id": "rT7DgCr-3pg"},
+        {"name": "Overhead Press", "equipment": ["barbell"], "sets": 3, "reps": "6-10", "mins_per_set": 3, "video_id": "2yjwXTZQDDI"},
     ],
     "lower_body": [
-        {"name": "Bodyweight Squat", "sets": "4", "reps": "15-20", "equipment": [], "video_id": "aclHkVaku9U"},
-        {"name": "Reverse Lunge", "sets": "3", "reps": "10 each", "equipment": [], "video_id": "wrwwXE_x-pQ"},
-        {"name": "Goblet Squat", "sets": "4", "reps": "8-12", "equipment": ["dumbbells|kettlebell"], "video_id": "MeIiIdhvXT4"},
-        {"name": "Romanian Deadlift (DB)", "sets": "4", "reps": "8-12", "equipment": ["dumbbells"], "video_id": "0YONJjY6i6Q"},
-        {"name": "Back Squat", "sets": "5", "reps": "5", "equipment": ["barbell", "squat_rack"], "video_id": "ultWZbUMPL8"},
-        {"name": "Deadlift", "sets": "4", "reps": "4-6", "equipment": ["barbell"], "video_id": "op9kVnSso6Q"},
+        {"name": "Bodyweight Squat", "equipment": [], "sets": 4, "reps": "15-20", "mins_per_set": 2, "video_id": "aclHkVaku9U"},
+        {"name": "Reverse Lunge", "equipment": [], "sets": 3, "reps": "10 each", "mins_per_set": 2, "video_id": "wrwwXE_x-pQ"},
+        {"name": "Goblet Squat", "equipment": ["dumbbells|kettlebell"], "sets": 4, "reps": "8-12", "mins_per_set": 3, "video_id": "MeIiIdhvXT4"},
+        {"name": "DB Romanian Deadlift", "equipment": ["dumbbells"], "sets": 4, "reps": "8-12", "mins_per_set": 3, "video_id": "0YONJjY6i6Q"},
+        {"name": "Back Squat", "equipment": ["barbell", "squat_rack"], "sets": 5, "reps": "5", "mins_per_set": 3, "video_id": "ultWZbUMPL8"},
+        {"name": "Deadlift", "equipment": ["barbell"], "sets": 4, "reps": "4-6", "mins_per_set": 3, "video_id": "op9kVnSso6Q"},
     ],
     "core": [
-        {"name": "Plank", "sets": "4", "reps": "30-60 sec", "equipment": [], "video_id": "ASdvN_XEl_c"},
-        {"name": "Dead Bug", "sets": "3", "reps": "10 each", "equipment": [], "video_id": "4XLEnwUr8S4"},
-        {"name": "Russian Twist", "sets": "3", "reps": "20 total", "equipment": ["dumbbells|kettlebell"], "video_id": "wkD8rjkodUI"},
-        {"name": "Cable Crunch", "sets": "4", "reps": "12-15", "equipment": ["cable_machine"], "video_id": "AV5PmZJIrrw"},
+        {"name": "Plank", "equipment": [], "sets": 4, "reps": "30-60 sec", "mins_per_set": 2, "video_id": "ASdvN_XEl_c"},
+        {"name": "Dead Bug", "equipment": [], "sets": 3, "reps": "10 each", "mins_per_set": 2, "video_id": "4XLEnwUr8S4"},
+        {"name": "Russian Twist", "equipment": ["dumbbells|kettlebell"], "sets": 3, "reps": "20 total", "mins_per_set": 2, "video_id": "wkD8rjkodUI"},
+        {"name": "Cable Crunch", "equipment": ["cable_machine"], "sets": 4, "reps": "12-15", "mins_per_set": 3, "video_id": "AV5PmZJIrrw"},
     ],
     "full_body": [
-        {"name": "Push-ups", "sets": "3", "reps": "10-15", "equipment": [], "video_id": "IODxDxX7oi4"},
-        {"name": "Bodyweight Squat", "sets": "3", "reps": "15-20", "equipment": [], "video_id": "aclHkVaku9U"},
-        {"name": "Goblet Squat", "sets": "4", "reps": "8-12", "equipment": ["dumbbells|kettlebell"], "video_id": "MeIiIdhvXT4"},
-        {"name": "Dumbbell Row", "sets": "4", "reps": "8-12", "equipment": ["dumbbells"], "video_id": "pYcpY20QaE8"},
-        {"name": "Back Squat", "sets": "4", "reps": "5-8", "equipment": ["barbell", "squat_rack"], "video_id": "ultWZbUMPL8"},
-        {"name": "Bench Press", "sets": "4", "reps": "5-8", "equipment": ["barbell", "bench"], "video_id": "rT7DgCr-3pg"},
+        {"name": "Push-ups", "equipment": [], "sets": 3, "reps": "10-15", "mins_per_set": 2, "video_id": "IODxDxX7oi4"},
+        {"name": "Bodyweight Squat", "equipment": [], "sets": 3, "reps": "15-20", "mins_per_set": 2, "video_id": "aclHkVaku9U"},
+        {"name": "Goblet Squat", "equipment": ["dumbbells|kettlebell"], "sets": 4, "reps": "8-12", "mins_per_set": 3, "video_id": "MeIiIdhvXT4"},
+        {"name": "Dumbbell Row", "equipment": ["dumbbells"], "sets": 4, "reps": "8-12", "mins_per_set": 3, "video_id": "pYcpY20QaE8"},
+        {"name": "Back Squat", "equipment": ["barbell", "squat_rack"], "sets": 4, "reps": "5-8", "mins_per_set": 3, "video_id": "ultWZbUMPL8"},
+        {"name": "Bench Press", "equipment": ["barbell", "bench"], "sets": 4, "reps": "5-8", "mins_per_set": 3, "video_id": "rT7DgCr-3pg"},
     ],
 }
 
-GOAL_FINISHERS = {
-    "fat_loss": [
-        {"name": "HIIT Finisher", "sets": "5 rounds", "reps": "40s on / 20s off", "equipment": [], "video_id": "ml6cT4AZdqI"}
-    ],
-    "endurance": [
-        {"name": "Zone 2 Cardio", "sets": "1", "reps": "20-40 min", "equipment": ["bike|treadmill|rower"], "video_id": "x9Q6xg2z2iE"}
-    ],
-    "strength": []
+FULL_GYM = {"barbell", "squat_rack", "cable_machine", "bench"}
+BASIC = {
+    "dumbbells", "kettlebell", "resistance_bands", "pullup_bar",
+    "bike", "rower", "treadmill", "jump_rope"
 }
 
 
 def has_required_equipment(required_rules: list[str], selected: set[str]) -> bool:
-    """
-    required_rules examples:
-    - []                    -> no equipment needed
-    - ["dumbbells"]         -> must have dumbbells
-    - ["barbell","bench"]   -> must have both
-    - ["bike|treadmill"]    -> has one of these
-    """
     if not required_rules:
         return True
-
     for rule in required_rules:
         if "|" in rule:
             options = set(rule.split("|"))
             if not (options & selected):
                 return False
-        else:
-            if rule not in selected:
-                return False
+        elif rule not in selected:
+            return False
     return True
 
 
-def filter_exercises_for_equipment(exercises: list[dict], equipment_items: list[str]) -> list[dict]:
-    selected = {e.strip().lower() for e in equipment_items if e.strip() and e.strip().lower() != "none"}
-    filtered = [ex for ex in exercises if has_required_equipment(ex["equipment"], selected)]
-
-    # fallback if user selected gear that leaves nothing: return bodyweight-only options
-    if not filtered:
-        filtered = [ex for ex in exercises if ex["equipment"] == []]
-
-    return filtered
-
-
-def trim_for_time(exercises: list[dict], minutes: int) -> list[dict]:
-    if minutes < 20:
-        return exercises[:3]
-    if minutes <= 45:
-        return exercises[:4]
-    return exercises[:6]
-
-
-def build_plan(goal: str, body_part: str, equipment: list[str], minutes: int) -> list[dict]:
-    goal = goal if goal in {"strength", "fat_loss", "endurance"} else "strength"
+def filtered_options(body_part: str, equipment_items: list[str]) -> list[dict]:
     body_part = body_part if body_part in EXERCISES else "full_body"
-    minutes = max(1, minutes)
-
-    base = EXERCISES[body_part]
-    base = filter_exercises_for_equipment(base, equipment)
-    base = trim_for_time(base, minutes)
-
-    finishers = filter_exercises_for_equipment(GOAL_FINISHERS.get(goal, []), equipment)
-    if finishers:
-        base += finishers[:1]
-
-    return base
+    selected = {x.strip().lower() for x in equipment_items if x.strip() and x.lower() != "none"}
+    options = [e for e in EXERCISES[body_part] if has_required_equipment(e["equipment"], selected)]
+    if not options:
+        options = [e for e in EXERCISES[body_part] if not e["equipment"]]
+    return options
 
 
 def checked(value: str, selected: list[str]) -> str:
@@ -120,44 +76,67 @@ def selected_attr(value: str, current: str) -> str:
     return "selected" if value == current else ""
 
 
-def render_plan_cards(plan: list[dict]) -> str:
+def render_exercise_cards(options: list[dict], target_minutes: int) -> str:
     cards = []
-    for ex in plan:
-        video = f"""
-        <iframe
-          width="100%"
-          height="220"
-          src="https://www.youtube.com/embed/{ex['video_id']}"
-          title="{ex['name']} demo"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          loading="lazy"></iframe>
-        """ if ex.get("video_id") else "<p>No demo available</p>"
-
+    for i, ex in enumerate(options):
+        est_total = ex["sets"] * ex["mins_per_set"]
+        set_boxes = "".join(
+            f'<label><input type="checkbox" class="set-box" data-ex="{i}"> Set {s}</label>'
+            for s in range(1, ex["sets"] + 1)
+        )
         cards.append(f"""
         <div class="exercise-card">
-          <h3>{ex['name']}</h3>
-          <p><strong>Sets:</strong> {ex['sets']} &nbsp; | &nbsp; <strong>Reps/Time:</strong> {ex['reps']}</p>
-          {video}
-        </div>
-        """)
-    return "".join(cards)
+          <div class="row">
+            <label>
+              <input type="checkbox" class="exercise-pick" data-mins="{est_total}" data-ex="{i}" />
+              <strong>{ex["name"]}</strong>
+            </label>
+            <span class="chip">~{est_total} min</span>
+          </div>
+          <p>Sets: {ex["sets"]} | Reps/Time: {ex["reps"]}</p>
 
+          <iframe width="100%" height="220"
+            src="https://www.youtube.com/embed/{ex["video_id"]}"
+            title="{ex["name"]} demo"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
 
-def render_page(plan=None, goal="strength", body_part="full_body", minutes=30, equipment=None):
-    equipment = equipment or []
-    plan_html = ""
-    if plan:
-        plan_html = f"""
-        <div class="card" style="margin-top:1rem;">
-          <h2>Your Workout Plan</h2>
-          <p>Only exercises that match your selected equipment are shown.</p>
-          <div class="exercise-grid">
-            {render_plan_cards(plan)}
+          <div class="set-track">
+            <p><strong>Track Sets</strong></p>
+            {set_boxes}
+          </div>
+
+          <div class="rest-timer">
+            <p><strong>Rest Timer</strong> <span id="timer-{i}" class="timer">00:00</span></p>
+            <button type="button" onclick="startTimer({i}, 30)">30s</button>
+            <button type="button" onclick="startTimer({i}, 60)">60s</button>
+            <button type="button" onclick="startTimer({i}, 90)">90s</button>
+            <button type="button" onclick="stopTimer({i})">Stop</button>
           </div>
         </div>
-        """
+        """)
+    return f"""
+    <div class="card" style="margin-top:1rem;">
+      <h2>Pick Your Exercises</h2>
+      <p>Target time: <strong>{target_minutes} min</strong></p>
+      <p id="time-status"><strong>Selected time:</strong> 0 min</p>
+      <div class="exercise-grid">
+        {''.join(cards)}
+      </div>
+    </div>
+    """
+
+
+def render_page(
+    options=None,
+    goal="strength",
+    body_part="full_body",
+    minutes=30,
+    equipment=None
+):
+    equipment = equipment or []
+    options_html = render_exercise_cards(options, minutes) if options else ""
 
     return f"""
 <!doctype html>
@@ -167,19 +146,24 @@ def render_page(plan=None, goal="strength", body_part="full_body", minutes=30, e
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Free Workout Decider</title>
   <style>
-    body {{ font-family: Arial, sans-serif; max-width: 1000px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
+    body {{ font-family: Arial, sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
     .card {{ background:#fff; border-radius:12px; padding:1rem; box-shadow:0 8px 24px rgba(0,0,0,.08); }}
     .equip {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.4rem; border:1px solid #e2e8f0; border-radius:10px; padding:.75rem; }}
     input, select, button {{ padding:.55rem; margin-top:.25rem; }}
     button {{ background:#2563eb; color:white; border:none; border-radius:8px; cursor:pointer; }}
-    .exercise-grid {{ display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }}
+    .exercise-grid {{ display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); }}
     .exercise-card {{ border:1px solid #e5e7eb; border-radius:10px; padding:.75rem; background:#fff; }}
-    h3 {{ margin-bottom:.4rem; }}
+    .row {{ display:flex; justify-content:space-between; align-items:center; gap:0.5rem; }}
+    .chip {{ background:#eef2ff; color:#3730a3; border-radius:999px; padding:0.2rem 0.6rem; font-size:0.8rem; }}
+    .set-track label {{ display:inline-block; margin-right:.5rem; margin-bottom:.25rem; }}
+    .timer {{ font-family:monospace; font-weight:700; margin-left:.3rem; }}
+    .ok {{ color: #166534; }}
+    .warn {{ color: #991b1b; }}
   </style>
 </head>
 <body>
   <h1>Free Workout Decider</h1>
-  <p>Pick your goal, body part, and equipment. We’ll only show compatible exercises with demos.</p>
+  <p>Select goal/body part/equipment, then pick exercises until you hit your target time.</p>
 
   <form method="post" action="/decide" class="card">
     <p>
@@ -209,7 +193,7 @@ def render_page(plan=None, goal="strength", body_part="full_body", minutes=30, e
       <label><input type="checkbox" name="equipment" value="resistance_bands" {checked("resistance_bands", equipment)}> Resistance Bands</label>
       <label><input type="checkbox" name="equipment" value="pullup_bar" {checked("pullup_bar", equipment)}> Pull-up Bar</label>
       <label><input type="checkbox" name="equipment" value="jump_rope" {checked("jump_rope", equipment)}> Jump Rope</label>
-      <label><input type="checkbox" name="equipment" value="bike" {checked("bike", equipment)}> Exercise Bike</label>
+      <label><input type="checkbox" name="equipment" value="bike" {checked("bike", equipment)}> Bike</label>
       <label><input type="checkbox" name="equipment" value="rower" {checked("rower", equipment)}> Rower</label>
       <label><input type="checkbox" name="equipment" value="treadmill" {checked("treadmill", equipment)}> Treadmill</label>
       <label><input type="checkbox" name="equipment" value="barbell" {checked("barbell", equipment)}> Barbell</label>
@@ -219,14 +203,85 @@ def render_page(plan=None, goal="strength", body_part="full_body", minutes=30, e
     </div>
 
     <p>
-      <label><strong>Minutes Available</strong></label><br/>
+      <label><strong>Target Workout Time (minutes)</strong></label><br/>
       <input type="number" name="minutes" min="10" max="120" value="{minutes}" required />
     </p>
 
-    <button type="submit">Build Workout Plan</button>
+    <button type="submit">Show Matching Exercises</button>
   </form>
 
-  {plan_html}
+  {options_html}
+
+  <script>
+    // ----- time matching logic -----
+    const target = {minutes};
+    const picks = document.querySelectorAll('.exercise-pick');
+    const status = document.getElementById('time-status');
+
+    function updateSelectedTime() {{
+      if (!status) return;
+      let total = 0;
+      picks.forEach(p => {{
+        if (p.checked) total += Number(p.dataset.mins || 0);
+      }});
+      if (total >= target) {{
+        status.innerHTML = `<strong>Selected time:</strong> ${total} min ✅ target met`;
+        status.className = 'ok';
+      }} else {{
+        status.innerHTML = `<strong>Selected time:</strong> ${total} min (need ${target - total} more)`;
+        status.className = 'warn';
+      }}
+    }}
+
+    picks.forEach(p => p.addEventListener('change', updateSelectedTime));
+    updateSelectedTime();
+
+    // ----- set tracking persistence -----
+    const setBoxes = document.querySelectorAll('.set-box');
+    setBoxes.forEach((box, idx) => {{
+      const key = 'setbox-' + idx;
+      box.checked = localStorage.getItem(key) === '1';
+      box.addEventListener('change', () => {{
+        localStorage.setItem(key, box.checked ? '1' : '0');
+      }});
+    }});
+
+    // ----- rest timers -----
+    const timers = {{}};
+
+    function fmt(sec) {{
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      return `${{m}}:${{s}}`;
+    }}
+
+    window.startTimer = function(exId, duration) {{
+      stopTimer(exId);
+      let left = duration;
+      const el = document.getElementById(`timer-${{exId}}`);
+      if (!el) return;
+      el.textContent = fmt(left);
+
+      timers[exId] = setInterval(() => {{
+        left -= 1;
+        el.textContent = fmt(Math.max(left, 0));
+        if (left <= 0) {{
+          clearInterval(timers[exId]);
+          el.textContent = "DONE ✅";
+          try {{ new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg").play(); }} catch (e) {{}}
+        }}
+      }}, 1000);
+    }}
+
+    window.stopTimer = function(exId) {{
+      if (timers[exId]) {{
+        clearInterval(timers[exId]);
+        delete timers[exId];
+      }}
+      const el = document.getElementById(`timer-${{exId}}`);
+      if (el) el.textContent = "00:00";
+    }}
+  </script>
 </body>
 </html>
 """
@@ -244,5 +299,5 @@ async def decide(
     equipment: list[str] = Form(default=[]),
     minutes: int = Form(...)
 ):
-    plan = build_plan(goal, body_part, equipment, minutes)
-    return render_page(plan=plan, goal=goal, body_part=body_part, minutes=minutes, equipment=equipment)
+    options = filtered_options(body_part, equipment)
+    return render_page(options=options, goal=goal, body_part=body_part, minutes=minutes, equipment=equipment)
