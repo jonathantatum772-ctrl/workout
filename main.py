@@ -9,27 +9,53 @@ EXERCISES = {
     "full_body": [
         {"id": "pushups", "name": "Push-ups", "default_sets": 3, "default_reps": "10-15", "mins": 6},
         {"id": "bw_squat", "name": "Bodyweight Squat", "default_sets": 3, "default_reps": "15-20", "mins": 6},
-        {"id": "walking_lunge", "name": "Walking Lunge", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
         {"id": "db_row", "name": "Dumbbell Row", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
         {"id": "goblet_squat", "name": "Goblet Squat", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells|kettlebell"]},
     ],
-    "upper_body": [
+    "chest": [
         {"id": "pushups", "name": "Push-ups", "default_sets": 4, "default_reps": "10-15", "mins": 8},
+        {"id": "diamond_pushups", "name": "Diamond Push-ups", "default_sets": 3, "default_reps": "8-12", "mins": 7},
         {"id": "db_bench", "name": "Dumbbell Bench Press", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
-        {"id": "db_shoulder_press", "name": "Dumbbell Shoulder Press", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
-        {"id": "pullups", "name": "Pull-ups", "default_sets": 4, "default_reps": "AMRAP", "mins": 10, "needs": ["pullup_bar"]},
+        {"id": "incline_db_press", "name": "Incline DB Press", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells", "bench"]},
+        {"id": "barbell_bench", "name": "Barbell Bench Press", "default_sets": 5, "default_reps": "5", "mins": 12, "needs": ["barbell", "bench"]},
     ],
-    "lower_body": [
+    "triceps": [
+        {"id": "bench_dips", "name": "Bench/Chair Dips", "default_sets": 4, "default_reps": "10-15", "mins": 8},
+        {"id": "close_pushups", "name": "Close-Grip Push-ups", "default_sets": 4, "default_reps": "8-12", "mins": 8},
+        {"id": "db_oh_ext", "name": "DB Overhead Tricep Extension", "default_sets": 3, "default_reps": "10-15", "mins": 8, "needs": ["dumbbells"]},
+        {"id": "db_kickback", "name": "DB Tricep Kickback", "default_sets": 3, "default_reps": "12-15", "mins": 8, "needs": ["dumbbells"]},
+        {"id": "cable_pushdown", "name": "Cable Pushdown", "default_sets": 4, "default_reps": "10-15", "mins": 10, "needs": ["cable_machine"]},
+    ],
+    "biceps": [
+        {"id": "towel_curl_iso", "name": "Towel Curl Isometric", "default_sets": 3, "default_reps": "20-30 sec", "mins": 7},
+        {"id": "chinup_hold", "name": "Chin-Up Hold", "default_sets": 4, "default_reps": "15-30 sec", "mins": 8, "needs": ["pullup_bar"]},
+        {"id": "db_curl", "name": "Dumbbell Curl", "default_sets": 4, "default_reps": "10-15", "mins": 9, "needs": ["dumbbells"]},
+        {"id": "hammer_curl", "name": "Hammer Curl", "default_sets": 4, "default_reps": "10-12", "mins": 9, "needs": ["dumbbells"]},
+        {"id": "barbell_curl", "name": "Barbell Curl", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["barbell"]},
+    ],
+    "back": [
+        {"id": "superman", "name": "Superman", "default_sets": 4, "default_reps": "12-15", "mins": 7},
+        {"id": "bird_dog", "name": "Bird Dog", "default_sets": 3, "default_reps": "10 each side", "mins": 6},
+        {"id": "pullups", "name": "Pull-ups", "default_sets": 4, "default_reps": "AMRAP", "mins": 10, "needs": ["pullup_bar"]},
+        {"id": "db_row", "name": "Dumbbell Row", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
+        {"id": "barbell_row", "name": "Barbell Row", "default_sets": 4, "default_reps": "6-10", "mins": 10, "needs": ["barbell"]},
+        {"id": "lat_pulldown", "name": "Lat Pulldown", "default_sets": 4, "default_reps": "10-12", "mins": 10, "needs": ["cable_machine"]},
+    ],
+    "legs": [
         {"id": "bw_squat", "name": "Bodyweight Squat", "default_sets": 4, "default_reps": "15-20", "mins": 8},
         {"id": "reverse_lunge", "name": "Reverse Lunge", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
         {"id": "glute_bridge", "name": "Glute Bridge", "default_sets": 4, "default_reps": "12-20", "mins": 8},
+        {"id": "step_ups", "name": "Step-ups", "default_sets": 3, "default_reps": "10 each leg", "mins": 8},
         {"id": "goblet_squat", "name": "Goblet Squat", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells|kettlebell"]},
+        {"id": "db_rdl", "name": "DB Romanian Deadlift", "default_sets": 4, "default_reps": "8-12", "mins": 10, "needs": ["dumbbells"]},
+        {"id": "barbell_squat", "name": "Barbell Back Squat", "default_sets": 5, "default_reps": "5", "mins": 12, "needs": ["barbell", "squat_rack"]},
     ],
     "core": [
         {"id": "plank", "name": "Plank", "default_sets": 4, "default_reps": "30-60 sec", "mins": 8},
         {"id": "side_plank", "name": "Side Plank", "default_sets": 3, "default_reps": "30-45 sec each", "mins": 7},
-        {"id": "deadbug", "name": "Dead Bug", "default_sets": 3, "default_reps": "10 each side", "mins": 6},
+        {"id": "deadbug", "name": "Dead Bug", "default_sets": 3, "default_reps": "10 each", "mins": 6},
         {"id": "bicycle_crunch", "name": "Bicycle Crunch", "default_sets": 3, "default_reps": "20 total", "mins": 6},
+        {"id": "leg_raises", "name": "Leg Raises", "default_sets": 3, "default_reps": "10-15", "mins": 7},
     ],
 }
 
@@ -38,9 +64,7 @@ def has_equipment(exercise: dict, selected: list[str]) -> bool:
     needs = exercise.get("needs", [])
     if not needs:
         return True
-
     selected_set = {x.strip().lower() for x in selected if x.strip() and x.lower() != "none"}
-
     for rule in needs:
         if "|" in rule:
             options = set(rule.split("|"))
@@ -52,10 +76,10 @@ def has_equipment(exercise: dict, selected: list[str]) -> bool:
 
 
 def get_filtered_options(body_part: str, equipment: list[str]) -> list[dict]:
-    body = body_part if body_part in EXERCISES else "full_body"
-    options = [e for e in EXERCISES[body] if has_equipment(e, equipment)]
+    part = body_part if body_part in EXERCISES else "full_body"
+    options = [e for e in EXERCISES[part] if has_equipment(e, equipment)]
     if not options:
-        options = [e for e in EXERCISES[body] if "needs" not in e]
+        options = [e for e in EXERCISES[part] if "needs" not in e]
     return options
 
 
@@ -75,12 +99,12 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
     for ex in options:
         cards += f"""
         <div class="exercise-card">
-          <label>
+          <label class="title-row">
             <input type="checkbox" name="selected_exercises" value="{ex['id']}" class="pick-box" data-mins="{ex['mins']}">
             <strong>{ex['name']}</strong>
           </label>
           <p>Suggested: {ex['default_sets']} sets x {ex['default_reps']}</p>
-          <p>Estimated time: ~{ex['mins']} min</p>
+          <p class="muted">Estimated time: ~{ex['mins']} min</p>
         </div>
         """
 
@@ -88,14 +112,14 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
     if options:
         payload = json.dumps(options).replace('"', "&quot;")
         options_block = f"""
-        <form method="post" action="/start" class="card" style="margin-top:1rem;">
+        <form method="post" action="/start" class="card glass" style="margin-top:1rem;">
           <h2>Select Exercises</h2>
           <p><strong>Target time:</strong> {minutes} min</p>
           <p id="pick-status"><strong>Selected time:</strong> 0 min</p>
           <div class="grid">{cards}</div>
           <input type="hidden" name="target_minutes" value="{minutes}">
           <input type="hidden" name="exercise_payload" value="{payload}">
-          <button type="submit" style="margin-top:1rem;">Start Workout</button>
+          <button type="submit" class="btn-primary" style="margin-top:1rem;">Start Workout</button>
         </form>
         """
 
@@ -105,59 +129,130 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Workout Planner</title>
+  <title>Workout Decider</title>
   <style>
-    body {{ font-family: Arial, sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
-    .card {{ background:#fff; border-radius:12px; padding:1rem; box-shadow:0 8px 24px rgba(0,0,0,.08); }}
-    .equip {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:.4rem; border:1px solid #e2e8f0; border-radius:10px; padding:.75rem; }}
-    .grid {{ display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }}
-    .exercise-card {{ border:1px solid #e5e7eb; border-radius:10px; padding:.75rem; background:#fff; }}
-    .history-item {{ border:1px solid #e5e7eb; border-radius:8px; padding:.6rem; margin-bottom:.6rem; background:#fff; }}
+    :root {{
+      --bg1: #0f172a;
+      --bg2: #111827;
+      --card: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.15);
+      --text: #e5e7eb;
+      --muted: #cbd5e1;
+      --accent: #60a5fa;
+      --accent2: #22d3ee;
+      --success: #22c55e;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top right, #1e3a8a 0%, var(--bg1) 45%, var(--bg2) 100%);
+      min-height: 100vh;
+    }}
+    .wrap {{ max-width: 1100px; margin: 2rem auto; padding: 0 1rem 2rem; }}
+    .card {{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem;
+      backdrop-filter: blur(8px);
+    }}
+    .glass {{ box-shadow: 0 12px 32px rgba(0,0,0,.25); }}
+    h1, h2, h3 {{ margin-top: .2rem; }}
+    .muted {{ color: var(--muted); }}
+    .equip {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: .45rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .75rem;
+      background: rgba(255,255,255,.03);
+    }}
+    .grid {{
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }}
+    .exercise-card {{
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .75rem;
+      background: rgba(255,255,255,.03);
+    }}
+    .title-row {{ display: flex; gap: .5rem; align-items: center; }}
+    input, select, button {{
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: .55rem .65rem;
+      color: var(--text);
+      background: rgba(255,255,255,.06);
+    }}
+    button {{ cursor: pointer; }}
+    .btn-primary {{
+      border: none;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color: #0b1020;
+      font-weight: 700;
+    }}
+    .history-item {{
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .7rem;
+      margin-bottom: .6rem;
+      background: rgba(255,255,255,.03);
+    }}
     .history-ex {{ margin: .4rem 0 .2rem 1rem; }}
-    input, select, button {{ padding:.5rem; }}
   </style>
 </head>
 <body>
-  <h1>Free Workout Decider</h1>
+  <div class="wrap">
+    <h1>Free Workout Decider</h1>
+    <p class="muted">Pick exact muscle groups, equipment, and time.</p>
 
-  <form method="post" action="/decide" class="card">
-    <p>
-      <label><strong>Body Part</strong></label><br/>
-      <select name="body_part" required>
-        <option value="full_body" {selected_attr("full_body", body_part)}>Full Body</option>
-        <option value="upper_body" {selected_attr("upper_body", body_part)}>Upper Body</option>
-        <option value="lower_body" {selected_attr("lower_body", body_part)}>Lower Body</option>
-        <option value="core" {selected_attr("core", body_part)}>Core</option>
-      </select>
-    </p>
+    <form method="post" action="/decide" class="card glass">
+      <p>
+        <label><strong>Muscle Group</strong></label><br/>
+        <select name="body_part" required>
+          <option value="full_body" {selected_attr("full_body", body_part)}>Full Body</option>
+          <option value="chest" {selected_attr("chest", body_part)}>Chest</option>
+          <option value="triceps" {selected_attr("triceps", body_part)}>Triceps</option>
+          <option value="biceps" {selected_attr("biceps", body_part)}>Biceps</option>
+          <option value="back" {selected_attr("back", body_part)}>Back</option>
+          <option value="legs" {selected_attr("legs", body_part)}>Legs</option>
+          <option value="core" {selected_attr("core", body_part)}>Core</option>
+        </select>
+      </p>
 
-    <p><strong>Equipment</strong></p>
-    <div class="equip">
-      <label><input type="checkbox" name="equipment" value="none" {checked("none", equipment)}> None</label>
-      <label><input type="checkbox" name="equipment" value="dumbbells" {checked("dumbbells", equipment)}> Dumbbells</label>
-      <label><input type="checkbox" name="equipment" value="kettlebell" {checked("kettlebell", equipment)}> Kettlebell</label>
-      <label><input type="checkbox" name="equipment" value="barbell" {checked("barbell", equipment)}> Barbell</label>
-      <label><input type="checkbox" name="equipment" value="bench" {checked("bench", equipment)}> Bench</label>
-      <label><input type="checkbox" name="equipment" value="squat_rack" {checked("squat_rack", equipment)}> Squat Rack</label>
-      <label><input type="checkbox" name="equipment" value="cable_machine" {checked("cable_machine", equipment)}> Cable Machine</label>
-      <label><input type="checkbox" name="equipment" value="resistance_bands" {checked("resistance_bands", equipment)}> Resistance Bands</label>
-      <label><input type="checkbox" name="equipment" value="pullup_bar" {checked("pullup_bar", equipment)}> Pull-up Bar</label>
+      <p><strong>Equipment</strong></p>
+      <div class="equip">
+        <label><input type="checkbox" name="equipment" value="none" {checked("none", equipment)}> None</label>
+        <label><input type="checkbox" name="equipment" value="dumbbells" {checked("dumbbells", equipment)}> Dumbbells</label>
+        <label><input type="checkbox" name="equipment" value="kettlebell" {checked("kettlebell", equipment)}> Kettlebell</label>
+        <label><input type="checkbox" name="equipment" value="barbell" {checked("barbell", equipment)}> Barbell</label>
+        <label><input type="checkbox" name="equipment" value="bench" {checked("bench", equipment)}> Bench</label>
+        <label><input type="checkbox" name="equipment" value="squat_rack" {checked("squat_rack", equipment)}> Squat Rack</label>
+        <label><input type="checkbox" name="equipment" value="cable_machine" {checked("cable_machine", equipment)}> Cable Machine</label>
+        <label><input type="checkbox" name="equipment" value="resistance_bands" {checked("resistance_bands", equipment)}> Resistance Bands</label>
+        <label><input type="checkbox" name="equipment" value="pullup_bar" {checked("pullup_bar", equipment)}> Pull-up Bar</label>
+      </div>
+
+      <p>
+        <label><strong>Custom Target Minutes</strong></label><br/>
+        <input type="number" name="minutes" min="5" max="180" value="{minutes}" required />
+      </p>
+
+      <button type="submit" class="btn-primary">Show Matching Exercises</button>
+    </form>
+
+    {options_block}
+
+    <div class="card glass" style="margin-top:1rem;">
+      <h2>Past Workouts</h2>
+      <div id="history-list"></div>
+      <button type="button" id="clear-history-btn">Clear History</button>
     </div>
-
-    <p>
-      <label><strong>Custom Target Minutes</strong></label><br/>
-      <input type="number" name="minutes" min="5" max="180" value="{minutes}" required />
-    </p>
-
-    <button type="submit">Show Matching Exercises</button>
-  </form>
-
-  {options_block}
-
-  <div class="card" style="margin-top:1rem;">
-    <h2>Past Workouts</h2>
-    <div id="history-list"></div>
-    <button type="button" id="clear-history-btn">Clear History</button>
   </div>
 
   <script>
@@ -191,7 +286,7 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
         }}
 
         if (!items.length) {{
-          historyList.innerHTML = "<p>No saved workouts yet.</p>";
+          historyList.innerHTML = "<p class='muted'>No saved workouts yet.</p>";
           return;
         }}
 
@@ -200,19 +295,17 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
           var exHtml = "";
           (item.exercise_logs || []).forEach(function(ex) {{
             exHtml += "<div class='history-ex'>" +
-                      "<p><strong>" + ex.name + "</strong></p>" +
-                      "<p>Planned sets: " + ex.planned_sets + " | Completed sets: " + ex.completed_sets + "</p>" +
-                      "<p>Reps by set: " + (ex.reps_by_set || []).join(", ") + "</p>" +
+                        "<p><strong>" + ex.name + "</strong></p>" +
+                        "<p>Planned sets: " + ex.planned_sets + " | Completed sets: " + ex.completed_sets + "</p>" +
+                        "<p>Reps by set: " + (ex.reps_by_set || []).join(", ") + "</p>" +
                       "</div>";
           }});
-
           html += "<div class='history-item'>" +
-                  "<p><strong>Completed:</strong> " + (item.completed_at || "-") + "</p>" +
-                  "<p><strong>Target:</strong> " + item.target_minutes + " min | <strong>Actual:</strong> " + item.actual_duration + "</p>" +
-                  exHtml +
+                    "<p><strong>Completed:</strong> " + (item.completed_at || "-") + "</p>" +
+                    "<p><strong>Target:</strong> " + item.target_minutes + " min | <strong>Actual:</strong> " + item.actual_duration + "</p>" +
+                    exHtml +
                   "</div>";
         }});
-
         historyList.innerHTML = html;
       }}
 
@@ -231,22 +324,12 @@ def render_planner_page(options=None, body_part="full_body", minutes=30, equipme
 
 def render_session_page(selected_ids, payload, target_minutes):
     if not selected_ids:
-        return """
-        <html><body style='font-family:Arial;padding:2rem;'>
-          <h2>No exercises selected.</h2>
-          <p><a href='/'>Go back and select at least one exercise.</a></p>
-        </body></html>
-        """
+        return "<html><body style='font-family:Arial;padding:2rem;'><h2>No exercises selected.</h2><p><a href='/'>Go back.</a></p></body></html>"
 
     by_id = {e["id"]: e for e in payload}
     selected = [by_id[eid] for eid in selected_ids if eid in by_id]
     if not selected:
-        return """
-        <html><body style='font-family:Arial;padding:2rem;'>
-          <h2>Selected exercises not found.</h2>
-          <p><a href='/'>Back</a></p>
-        </body></html>
-        """
+        return "<html><body style='font-family:Arial;padding:2rem;'><h2>Selected exercises not found.</h2><p><a href='/'>Back</a></p></body></html>"
 
     rows = ""
     for ex_idx, ex in enumerate(selected):
@@ -289,42 +372,81 @@ def render_session_page(selected_ids, payload, target_minutes):
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Workout Session</title>
   <style>
-    body {{ font-family: Arial, sans-serif; max-width: 980px; margin: 2rem auto; padding: 0 1rem; background:#f5f7fb; }}
-    .session-card {{ background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:1rem; margin-bottom:1rem; }}
+    :root {{
+      --bg1: #0f172a;
+      --bg2: #111827;
+      --card: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.15);
+      --text: #e5e7eb;
+      --accent: #60a5fa;
+      --accent2: #22d3ee;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top right, #1e3a8a 0%, var(--bg1) 45%, var(--bg2) 100%);
+      min-height: 100vh;
+    }}
+    .wrap {{ max-width: 980px; margin: 2rem auto; padding: 0 1rem 2rem; }}
+    .session-card, .add-box {{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      backdrop-filter: blur(8px);
+    }}
     .set-list {{ display:grid; gap:.6rem; margin-top:.6rem; }}
-    .set-item {{ display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; border:1px solid #e5e7eb; border-radius:8px; padding:.5rem; }}
-    .set-timer {{ font-family:monospace; font-weight:700; min-width:60px; }}
-    .workout-timer {{ font-family:monospace; font-weight:700; font-size:1.2rem; margin-left:.5rem; }}
-    .add-box {{ background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:1rem; margin-bottom:1rem; }}
-    button, input {{ padding:.45rem; }}
+    .set-item {{
+      display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;
+      border:1px solid var(--border); border-radius:10px; padding:.55rem;
+      background: rgba(255,255,255,.03);
+    }}
+    .set-timer {{ font-family: monospace; font-weight: 700; min-width: 60px; }}
+    .workout-timer {{ font-family: monospace; font-weight: 700; font-size: 1.2rem; margin-left: .5rem; }}
+    button, input {{
+      border-radius: 10px; border: 1px solid var(--border);
+      color: var(--text); background: rgba(255,255,255,.06);
+      padding: .45rem .6rem;
+    }}
+    .btn-primary {{
+      border: none; color: #0b1020; font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }}
+    a {{ color: #93c5fd; }}
   </style>
 </head>
 <body>
-  <h1>Workout Session</h1>
-  <p><strong>Target time:</strong> {target_minutes} min</p>
+  <div class="wrap">
+    <h1>Workout Session</h1>
+    <p><strong>Target time:</strong> {target_minutes} min</p>
 
-  <div style="margin:.8rem 0 1rem 0;">
-    <button type="button" id="start-workout-btn">▶ Start Workout</button>
-    <button type="button" id="pause-workout-btn">⏸ Pause</button>
-    <button type="button" id="reset-workout-btn">↺ Reset</button>
-    <button type="button" id="complete-workout-btn">✅ Complete & Save Workout</button>
-    <span id="workout-countdown" class="workout-timer">00:00</span>
+    <div style="margin:.8rem 0 1rem 0;">
+      <button type="button" id="start-workout-btn" class="btn-primary">▶ Start Workout</button>
+      <button type="button" id="pause-workout-btn">⏸ Pause</button>
+      <button type="button" id="reset-workout-btn">↺ Reset</button>
+      <button type="button" id="complete-workout-btn">✅ Complete & Save Workout</button>
+      <span id="workout-countdown" class="workout-timer">00:00</span>
+    </div>
+
+    <div class="add-box">
+      <h3>Add Exercise Mid-Workout</h3>
+      <label>Exercise Name: <input type="text" id="new-ex-name" placeholder="e.g. Tricep Dips"></label>
+      <label>Sets: <input type="number" min="1" value="3" id="new-ex-sets"></label>
+      <label>Default reps: <input type="text" value="10-12" id="new-ex-reps"></label>
+      <button type="button" id="add-ex-btn" class="btn-primary">Add Exercise</button>
+    </div>
+
+    <p>Checking a set starts rest timer using that row’s custom rest value.</p>
+
+    <div id="session-container">
+      {rows}
+    </div>
+
+    <p><a href="/">← Back to planner</a></p>
   </div>
-
-  <div class="add-box">
-    <h3>Add Exercise Mid-Workout</h3>
-    <label>Exercise Name: <input type="text" id="new-ex-name" placeholder="e.g. Tricep Dips"></label>
-    <label>Sets: <input type="number" min="1" value="3" id="new-ex-sets"></label>
-    <label>Default reps: <input type="text" value="10-12" id="new-ex-reps"></label>
-    <button type="button" id="add-ex-btn">Add Exercise</button>
-  </div>
-
-  <p>Checking a set uses the custom rest input for that set and starts the timer.</p>
-  <div id="session-container">
-    {rows}
-  </div>
-
-  <p><a href="/">← Back to planner</a></p>
 
   <script>
     (function() {{
@@ -385,7 +507,7 @@ def render_session_page(selected_ids, payload, target_minutes):
         updateDisplay();
       }});
 
-      function getSetTimerEl(setId) {{
+      function timerEl(setId) {{
         return document.getElementById("rest-" + setId);
       }}
 
@@ -394,14 +516,14 @@ def render_session_page(selected_ids, payload, target_minutes):
           clearInterval(setTimers[setId]);
           delete setTimers[setId];
         }}
-        var el = getSetTimerEl(setId);
+        var el = timerEl(setId);
         if (el) el.textContent = "00:00";
       }}
 
       function startSetRest(setId, seconds) {{
         stopSetRest(setId);
         var left = seconds;
-        var el = getSetTimerEl(setId);
+        var el = timerEl(setId);
         if (!el) return;
         el.textContent = fmt(left);
 
@@ -416,7 +538,7 @@ def render_session_page(selected_ids, payload, target_minutes):
         }}, 1000);
       }}
 
-      function buildSetRow(exIdx, setNum) {{
+      function createSetRow(exIdx, setNum) {{
         var sid = exIdx + "-" + setNum;
         var div = document.createElement("div");
         div.className = "set-item";
@@ -440,24 +562,19 @@ def render_session_page(selected_ids, payload, target_minutes):
         card.className = "session-card";
         card.setAttribute("data-exercise-name", name);
         card.setAttribute("data-planned-sets", String(sets));
-
-        var html = "<h3>" + name + "</h3>" +
-                   "<p><strong>Suggested:</strong> " + sets + " sets x " + reps + "</p>" +
-                   "<button type='button' class='delete-ex-btn'>🗑 Delete Exercise</button>" +
-                   "<div class='set-list'></div>";
-        card.innerHTML = html;
-
+        card.innerHTML =
+          "<h3>" + name + "</h3>" +
+          "<p><strong>Suggested:</strong> " + sets + " sets x " + reps + "</p>" +
+          "<button type='button' class='delete-ex-btn'>🗑 Delete Exercise</button>" +
+          "<div class='set-list'></div>";
         var list = card.querySelector(".set-list");
         for (var i = 1; i <= sets; i++) {{
-          list.appendChild(buildSetRow(exIdx, i));
+          list.appendChild(createSetRow(exIdx, i));
         }}
-
         container.appendChild(card);
       }}
 
-      // Add exercise button
-      var addBtn = document.getElementById("add-ex-btn");
-      addBtn.addEventListener("click", function() {{
+      document.getElementById("add-ex-btn").addEventListener("click", function() {{
         var name = (document.getElementById("new-ex-name").value || "").trim();
         var sets = Number(document.getElementById("new-ex-sets").value || "3");
         var reps = (document.getElementById("new-ex-reps").value || "10-12").trim();
@@ -466,6 +583,7 @@ def render_session_page(selected_ids, payload, target_minutes):
           return;
         }}
         if (!sets || sets < 1) sets = 1;
+
         addExerciseCard(name, sets, reps);
 
         document.getElementById("new-ex-name").value = "";
@@ -473,30 +591,29 @@ def render_session_page(selected_ids, payload, target_minutes):
         document.getElementById("new-ex-reps").value = "10-12";
       }});
 
-      // CLICK event delegation (rest buttons / delete)
+      // event delegation
       document.addEventListener("click", function(e) {{
-        var target = e.target;
+        var t = e.target;
 
-        if (target.classList.contains("delete-ex-btn")) {{
-          var card = target.closest(".session-card");
+        if (t.classList.contains("delete-ex-btn")) {{
+          var card = t.closest(".session-card");
           if (card) card.remove();
           return;
         }}
 
-        var setItem = target.closest(".set-item");
+        var setItem = t.closest(".set-item");
         if (!setItem) return;
-
         var setId = setItem.getAttribute("data-setid");
         var restInput = setItem.querySelector(".custom-rest-input");
 
-        if (target.classList.contains("rest-btn")) {{
-          var sec = Number(target.getAttribute("data-seconds") || "60");
-          if (restInput) restInput.value = String(sec); // autofill
+        if (t.classList.contains("rest-btn")) {{
+          var sec = Number(t.getAttribute("data-seconds") || "60");
+          if (restInput) restInput.value = String(sec);
           startSetRest(setId, sec);
           return;
         }}
 
-        if (target.classList.contains("rest-custom-btn")) {{
+        if (t.classList.contains("rest-custom-btn")) {{
           var customSec = Number(restInput && restInput.value ? restInput.value : "60");
           if (!customSec || customSec < 5) customSec = 5;
           if (restInput) restInput.value = String(customSec);
@@ -504,34 +621,31 @@ def render_session_page(selected_ids, payload, target_minutes):
           return;
         }}
 
-        if (target.classList.contains("rest-stop-btn")) {{
+        if (t.classList.contains("rest-stop-btn")) {{
           stopSetRest(setId);
           return;
         }}
       }});
 
-      // CHANGE event delegation (checkbox auto-uses box value)
       document.addEventListener("change", function(e) {{
-        var target = e.target;
-        if (!target.classList.contains("set-done")) return;
+        var t = e.target;
+        if (!t.classList.contains("set-done")) return;
 
-        var setItem = target.closest(".set-item");
+        var setItem = t.closest(".set-item");
         if (!setItem) return;
-
         var setId = setItem.getAttribute("data-setid");
         var restInput = setItem.querySelector(".custom-rest-input");
-        var sec = Number(restInput && restInput.value ? restInput.value : "60");
-        if (!sec || sec < 5) sec = 5;
-        if (restInput) restInput.value = String(sec);
 
-        if (target.checked) {{
+        if (t.checked) {{
+          var sec = Number(restInput && restInput.value ? restInput.value : "60");
+          if (!sec || sec < 5) sec = 5;
+          if (restInput) restInput.value = String(sec);
           startSetRest(setId, sec);
         }} else {{
           stopSetRest(setId);
         }}
       }});
 
-      // Save workout
       completeBtn.addEventListener("click", function() {{
         if (workoutInterval) {{
           clearInterval(workoutInterval);
@@ -540,7 +654,6 @@ def render_session_page(selected_ids, payload, target_minutes):
 
         var now = new Date();
         var completedAt = now.toLocaleString();
-
         var actualSeconds = hasStarted ? (totalSeconds - remaining) : 0;
         var mins = Math.floor(actualSeconds / 60);
         var secs = actualSeconds % 60;
@@ -552,16 +665,15 @@ def render_session_page(selected_ids, payload, target_minutes):
         cards.forEach(function(card) {{
           var name = card.getAttribute("data-exercise-name") || "Exercise";
           var plannedSets = Number(card.getAttribute("data-planned-sets") || "0");
-
           var checks = card.querySelectorAll(".set-done");
           var reps = card.querySelectorAll(".set-reps");
 
           var completedSets = 0;
           var repsBySet = [];
 
-          checks.forEach(function(cb, idx) {{
+          checks.forEach(function(cb, i) {{
             if (cb.checked) completedSets += 1;
-            repsBySet.push(reps[idx] ? (reps[idx].value || "0") : "0");
+            repsBySet.push(reps[i] ? (reps[i].value || "0") : "0");
           }});
 
           exerciseLogs.push({{
@@ -590,7 +702,7 @@ def render_session_page(selected_ids, payload, target_minutes):
         history.push(item);
         localStorage.setItem("workout_history", JSON.stringify(history));
 
-        alert("Workout saved with full details.");
+        alert("Workout saved.");
       }});
     }})();
   </script>
